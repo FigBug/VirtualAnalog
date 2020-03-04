@@ -779,7 +779,7 @@
 		84A41CC962D36F56721995C9 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -787,7 +787,7 @@
 		B0C3E5367E3D5F55285A91D9 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -836,7 +836,8 @@
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/VST/";
 				LIBRARY_STYLE = Bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wunused-value";
 				OTHER_LDFLAGS = "-bundle -lVirtualAnalog";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SocaLabs.VirtualAnalog;
 				PRODUCT_NAME = "VirtualAnalog";
@@ -891,7 +892,8 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/VST/";
 				LIBRARY_STYLE = Bundle;
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wunused-value";
 				OTHER_LDFLAGS = "-bundle -lVirtualAnalog";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SocaLabs.VirtualAnalog;
 				PRODUCT_NAME = "VirtualAnalog";
@@ -944,7 +946,8 @@
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
 				LIBRARY_STYLE = Bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wunused-value";
 				OTHER_LDFLAGS = "-bundle -lVirtualAnalog";
 				OTHER_REZFLAGS = "-d ppc_$ppc -d i386_$i386 -d ppc64_$ppc64 -d x86_64_$x86_64 -I /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers -I \"$(DEVELOPER_DIR)/Extras/CoreAudio/AudioUnits/AUPublic/AUBase\" -I \"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SocaLabs.VirtualAnalog;
@@ -1000,7 +1003,8 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
 				LIBRARY_STYLE = Bundle;
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wunused-value";
 				OTHER_LDFLAGS = "-bundle -lVirtualAnalog";
 				OTHER_REZFLAGS = "-d ppc_$ppc -d i386_$i386 -d ppc64_$ppc64 -d x86_64_$x86_64 -I /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers -I \"$(DEVELOPER_DIR)/Extras/CoreAudio/AudioUnits/AUPublic/AUBase\" -I \"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SocaLabs.VirtualAnalog;
@@ -1049,7 +1053,8 @@
 					"$(inherited)",
 				);
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wunused-value";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SocaLabs.VirtualAnalog;
 				PRODUCT_NAME = "VirtualAnalog";
 				SKIP_INSTALL = YES;
@@ -1098,7 +1103,8 @@
 				);
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wunused-value";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SocaLabs.VirtualAnalog;
 				PRODUCT_NAME = "VirtualAnalog";
 				SKIP_INSTALL = YES;

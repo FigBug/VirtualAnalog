@@ -31,7 +31,7 @@ class VirtualAnalogAudioProcessor : public gin::GinProcessor,
 public:
     //==============================================================================
     VirtualAnalogAudioProcessor();
-    ~VirtualAnalogAudioProcessor();
+    ~VirtualAnalogAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;

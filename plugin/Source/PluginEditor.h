@@ -10,7 +10,7 @@ class VirtualAnalogAudioProcessorEditor : public gin::GinAudioProcessorEditor
 {
 public:
     VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor&);
-    ~VirtualAnalogAudioProcessorEditor();
+    ~VirtualAnalogAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (Graphics&) override;

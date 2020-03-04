@@ -16,6 +16,9 @@ void VirtualAnalogVoice::noteStarted()
 void VirtualAnalogVoice::noteStopped (bool allowTailOff)
 {
     adsr.noteOff();
+    
+    if (! allowTailOff)
+        clearCurrentNote();
 }
 
 void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
@@ -27,8 +30,18 @@ void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
 
 void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
+    ScratchBuffer buffer (2, numSamples);
+    
+    // Run ADSR
+    ScratchBuffer adsrOutput (1, numSamples);
+    adsr.process (adsrOutput);
+    
     if (adsr.getState() == AnalogADSR::State::idle)
         clearCurrentNote();
+    
+    // Copy output to synth
+    outputBuffer.copyFrom (0, startSample, buffer, 0, 0, numSamples);
+    outputBuffer.copyFrom (1, startSample, buffer, 1, 0, numSamples);
 }
 
 //==============================================================================
