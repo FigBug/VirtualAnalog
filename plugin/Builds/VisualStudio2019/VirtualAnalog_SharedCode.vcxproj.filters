@@ -502,6 +502,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\VirtualAnalogVoice.cpp">
+      <Filter>VirtualAnalog\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>VirtualAnalog\Source</Filter>
     </ClCompile>
@@ -2775,6 +2778,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\VirtualAnalogVoice.h">
+      <Filter>VirtualAnalog\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
       <Filter>VirtualAnalog\Source</Filter>
     </ClInclude>

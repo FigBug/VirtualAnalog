@@ -7,6 +7,7 @@ using namespace gin;
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
     : GinAudioProcessorEditor (p), proc (p)
 {
+    setGridSize (5, 3);
 }
 
 VirtualAnalogAudioProcessorEditor::~VirtualAnalogAudioProcessorEditor()

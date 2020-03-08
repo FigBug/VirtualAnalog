@@ -4,9 +4,13 @@
               companyName="SocaLabs" reportAppUsage="0" displaySplashScreen="0"
               pluginFormats="buildAU,buildVST" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
-              cppLanguageStandard="latest">
+              cppLanguageStandard="14" pluginChannelConfigs="{0,2}">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
+      <FILE id="hVjqti" name="VirtualAnalogVoice.cpp" compile="1" resource="0"
+            file="Source/VirtualAnalogVoice.cpp"/>
+      <FILE id="BmWCuH" name="VirtualAnalogVoice.h" compile="0" resource="0"
+            file="Source/VirtualAnalogVoice.h"/>
       <FILE id="p0fko7" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="IM4H1y" name="PluginProcessor.h" compile="0" resource="0"
