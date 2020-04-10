@@ -9,6 +9,11 @@ class VirtualAnalogVoice : public MPESynthesiserVoice,
                            public gin::ModVoice
 {
 public:
+    static const int numOSCs    = 4;
+    static const int numFilters = 2;
+    static const int numADSRs   = 2;
+    static const int numLFOs    = 4;
+
     VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, gin::BandLimitedLookupTables& bandLimitedLookupTables);
     
     void noteStarted() override;
@@ -29,18 +34,22 @@ private:
     VirtualAnalogAudioProcessor& proc;
     gin::BandLimitedLookupTables& bandLimitedLookupTables;
 
-    static const int numOSCs = 3;
-    
-    gin::VoicedStereoOscillator oscillators[numOSCs] = { bandLimitedLookupTables,
-                                                         bandLimitedLookupTables,
-                                                         bandLimitedLookupTables };
+    gin::VoicedStereoOscillator oscillators[numOSCs] =
+    {
+        bandLimitedLookupTables,
+        bandLimitedLookupTables,
+        bandLimitedLookupTables,
+        bandLimitedLookupTables,
+    };
 
-    gin::Filter filters[2];
-    gin::ADSR filterADSRs[2];
-    gin::ADSR modADSRs[2];
+    gin::Filter filters[numFilters];
+    gin::ADSR filterADSRs[numFilters];
+    
+    gin::ADSR modADSRs[numADSRs];
+    gin::LFO modLFOs[numLFOs];
 
     gin::AnalogADSR adsr;
 
-    float currentMidiNotes[3];
-    gin::VoicedStereoOscillator::Params oscParams[3];
+    float currentMidiNotes[numOSCs];
+    gin::VoicedStereoOscillator::Params oscParams[numOSCs];
 };

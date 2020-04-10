@@ -2,6 +2,8 @@
 
 #include <JuceHeader.h>
 
+#include "VirtualAnalogVoice.h"
+
 //==============================================================================
 class VirtualAnalogAudioProcessor : public gin::GinProcessor                                    
 {
@@ -42,19 +44,28 @@ public:
 
     struct EnvParams
     {
-
         gin::Parameter::Ptr attack, decay, sustain, release;
 
         void setup (VirtualAnalogAudioProcessor& p, int idx);
     };
+    
+    struct LFOParams
+    {
+        gin::Parameter::Ptr sync, wave, rate, beat, depth, phase, offset, fade, delay;
 
-    OSCParams oscParams[3];
-    FilterParams filterParams[2];
-    EnvParams envParams[2];
+        void setup (VirtualAnalogAudioProcessor& p, int idx);
+    };
+
+    OSCParams oscParams[VirtualAnalogVoice::numOSCs];
+    FilterParams filterParams[VirtualAnalogVoice::numFilters];
+    EnvParams envParams[VirtualAnalogVoice::numADSRs];
+    LFOParams lfoParams[VirtualAnalogVoice::numLFOs];
 
     gin::Parameter::Ptr attack, decay, sustain, release, velocityTracking;
 
     gin::ModMatrix modMatrix;
+    
+    AudioPlayHead* playhead = nullptr;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessor)

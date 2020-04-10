@@ -31,6 +31,12 @@ void VirtualAnalogVoice::noteStarted()
          a.reset();
          a.noteOn();
      }
+    
+    for (auto& l : modLFOs)
+    {
+        l.reset();
+        l.noteOn();
+    }
 
     adsr.reset();
     adsr.noteOn();
@@ -56,6 +62,9 @@ void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
 
     for (auto& a : filterADSRs)
         a.setSampleRate (newRate);
+    
+    for (auto& l : modLFOs)
+        l.setSampleRate (newRate);
 
     adsr.setSampleRate (newRate);
 }
@@ -67,7 +76,7 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     // Run OSC
     ScratchBuffer buffer (2, numSamples);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < numOSCs; i++)
         oscillators[i].processAdding (currentMidiNotes[i], oscParams[i], buffer);
 
     // Apply velocity
@@ -92,7 +101,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 {
     auto note = getCurrentlyPlayingNote();
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < numOSCs; i++)
     {
         currentMidiNotes[i] = float (note.initialNote + note.totalPitchbendInSemitones / 100.0);
         currentMidiNotes[i] += getValue (proc.oscParams[i].tune) + getValue (proc.oscParams[i].finetune) / 100.0f;
@@ -106,7 +115,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         oscParams[i].gain   = Decibels::decibelsToGain (getValue (proc.oscParams[i].level));
     }
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < numFilters; i++)
     {
         filterADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
         filterADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
@@ -133,7 +142,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         filterADSRs[i].process (blockSize);
     }
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < numADSRs; i++)
     {
         modADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
         modADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
@@ -141,6 +150,27 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         modADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
 
         modADSRs[i].process (blockSize);
+    }
+    
+    for (int i = 0; i < numLFOs; i++)
+    {
+        LFO::Parameters params;
+        
+        float freq = 0;
+        if (proc.lfoParams[i].sync->getProcValue() > 0.0f)
+            freq = 1.0f / NoteDuration::getNoteDurations()[size_t (proc.lfoParams[i].beat->getProcValue())].toSeconds (proc.playhead);
+        else
+            freq = getValue (proc.lfoParams[i].rate);
+        
+        params.waveShape = (LFO::WaveShape) int (proc.lfoParams[i].wave->getProcValue());
+        params.frequency = freq;
+        params.phase     = getValue (proc.lfoParams[i].phase);
+        params.offset    = getValue (proc.lfoParams[i].offset);
+        params.depth     = getValue (proc.lfoParams[i].depth);
+        params.delay     = getValue (proc.lfoParams[i].delay);
+        params.fade      = getValue (proc.lfoParams[i].fade);
+        
+        modLFOs[i].process (blockSize);
     }
 
     adsr.setAttack (getValue (proc.attack));
