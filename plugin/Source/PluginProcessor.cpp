@@ -78,6 +78,18 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
 }
 
 //==============================================================================
+void VirtualAnalogAudioProcessor::ADSRParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    velocityTracking = p.addExtParam ("vel",     "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
+    attack           = p.addExtParam ("attack",  "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
+    decay            = p.addExtParam ("decay",   "Decay",   "D",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
+    sustain          = p.addExtParam ("sustain", "Sustain", "S",     "", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
+    release          = p.addExtParam ("release", "Release", "R",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
+
+    sustain->conversionFunction = [] (float in) { return in / 100.0f; };
+}
+
+//==============================================================================
 VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 {
     synth.enableLegacyMode();
@@ -94,17 +106,17 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 
     for (int i = 0; i < numElementsInArray (lfoParams); i++)
         lfoParams[i].setup (*this, i);
-    
-    velocityTracking = addExtParam ("vel",     "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
-    attack           = addExtParam ("attack",  "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
-    decay            = addExtParam ("decay",   "Decay",   "D",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
-    sustain          = addExtParam ("sustain", "Sustain", "S",     "", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
-    release          = addExtParam ("release", "Release", "R",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
 
-    sustain->conversionFunction = [] (float in) { return in / 100.0f; };
+    adsrParams.setup (*this);
 
     for (int i = 0; i < 36; i++)
-        synth.addVoice (new VirtualAnalogVoice (*this, bandLimitedLookupTables));
+    {
+        auto voice = new VirtualAnalogVoice (*this, bandLimitedLookupTables);
+        modMatrix.addVoice (voice);
+        synth.addVoice (voice);
+    }
+
+    setupModMatrix();
 }
 
 VirtualAnalogAudioProcessor::~VirtualAnalogAudioProcessor()
@@ -112,12 +124,47 @@ VirtualAnalogAudioProcessor::~VirtualAnalogAudioProcessor()
 }
 
 //==============================================================================
+void VirtualAnalogAudioProcessor::setupModMatrix()
+{
+    modSrcPressure  = modMatrix.addMonoModSource ("mpePressure");
+    modSrcTimbre    = modMatrix.addMonoModSource ("mpeTimbre");
+
+    modSrcModWheel  = modMatrix.addMonoModSource ("modWheel");
+    modScrPitchBend = modMatrix.addMonoModSource ("pitchBend");
+
+    modSrcNote      = modMatrix.addPolyModSource ("note");
+    modSrcVelocity  = modMatrix.addPolyModSource ("velocity");
+
+    for (int i = 0; i <= 119; i++)
+        modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("cc%d", i));
+
+    for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
+        modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("mlfo%d", i));
+
+    for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
+        modSrcLFO[i] = modMatrix.addPolyModSource (String::formatted ("lfo%d", i));
+
+    for (int i = 0; i < VirtualAnalogVoice::numFilters; i++)
+        modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("fenv%d", i));
+
+    for (int i = 0; i < VirtualAnalogVoice::numADSRs; i++)
+        modSrcEvn[i] = modMatrix.addPolyModSource (String::formatted ("env%d", i));
+
+    for (auto pp : getPluginParameters())
+        if (! pp->isInternal())
+            modMatrix.addParameter (pp);
+
+    modMatrix.build();
+}
+
 void VirtualAnalogAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     GinProcessor::prepareToPlay (sampleRate, samplesPerBlock);
     
     bandLimitedLookupTables.setSampleRate (sampleRate);
     synth.setCurrentPlaybackSampleRate (sampleRate);
+
+    modMatrix.setSampleRate (sampleRate);
 }
 
 void VirtualAnalogAudioProcessor::releaseResources()
@@ -138,12 +185,39 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     {
         int thisBlock = std::min (todo, 32);
         synth.renderNextBlock (buffer, midi, pos, thisBlock);
+
+        updateParams (thisBlock);
         
         pos += thisBlock;
         todo -= thisBlock;
     }
     
     playHead = nullptr;
+}
+
+void VirtualAnalogAudioProcessor::updateParams (int blockSize)
+{
+    for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
+    {
+        LFO::Parameters params;
+
+        float freq = 0;
+        if (lfoParams[i].sync->getProcValue() > 0.0f)
+            freq = 1.0f / NoteDuration::getNoteDurations()[size_t (lfoParams[i].beat->getProcValue())].toSeconds (playhead);
+        else
+            freq = modMatrix.getValue (lfoParams[i].rate);
+
+        params.waveShape = (LFO::WaveShape) int (lfoParams[i].wave->getProcValue());
+        params.frequency = freq;
+        params.phase     = modMatrix.getValue (lfoParams[i].phase);
+        params.offset    = modMatrix.getValue (lfoParams[i].offset);
+        params.depth     = modMatrix.getValue (lfoParams[i].depth);
+        params.delay     = 0;
+        params.fade      = 0;
+
+        modLFOs[i].setParameters (params);
+        modLFOs[i].process (blockSize);
+    }
 }
 
 //==============================================================================

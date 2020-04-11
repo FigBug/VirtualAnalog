@@ -22,9 +22,13 @@ public:
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
+    void updateParams (int blockSize);
+    void setupModMatrix();
+
     gin::BandLimitedLookupTables bandLimitedLookupTables;
     MPESynthesiser synth;
 
+    //==============================================================================
     struct OSCParams
     {
         gin::Parameter::Ptr wave, voices, tune, finetune, level, pulsewidth,
@@ -56,15 +60,36 @@ public:
         void setup (VirtualAnalogAudioProcessor& p, int idx);
     };
 
+    struct ADSRParams
+    {
+        gin::Parameter::Ptr attack, decay, sustain, release, velocityTracking;
+
+        void setup (VirtualAnalogAudioProcessor& p);
+    };
+
+    //==============================================================================
+    int modSrcPressure = 0, modSrcTimbre = 0, modSrcModWheel = 0, modScrPitchBend = 0,
+        modSrcNote = 0, modSrcVelocity = 0;
+
+    int modSrcCC[119]                                   = {0};
+    int modSrcMonoLFO[VirtualAnalogVoice::numLFOs]      = {0};
+    int modSrcLFO[VirtualAnalogVoice::numLFOs]          = {0};
+    int modSrcFilter[VirtualAnalogVoice::numFilters]    = {0};
+    int modSrcEvn[VirtualAnalogVoice::numADSRs]         = {0};
+
+    //==============================================================================
+
     OSCParams oscParams[VirtualAnalogVoice::numOSCs];
     FilterParams filterParams[VirtualAnalogVoice::numFilters];
     EnvParams envParams[VirtualAnalogVoice::numADSRs];
     LFOParams lfoParams[VirtualAnalogVoice::numLFOs];
 
-    gin::Parameter::Ptr attack, decay, sustain, release, velocityTracking;
+    ADSRParams adsrParams;
 
     gin::ModMatrix modMatrix;
-    
+
+    gin::LFO modLFOs[VirtualAnalogVoice::numLFOs];
+
     AudioPlayHead* playhead = nullptr;
 
     //==============================================================================

@@ -169,12 +169,13 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         params.depth     = getValue (proc.lfoParams[i].depth);
         params.delay     = getValue (proc.lfoParams[i].delay);
         params.fade      = getValue (proc.lfoParams[i].fade);
-        
+
+        modLFOs[i].setParameters (params);
         modLFOs[i].process (blockSize);
     }
 
-    adsr.setAttack (getValue (proc.attack));
-    adsr.setDecay (getValue (proc.decay));
-    adsr.setSustainLevel (getValue (proc.sustain));
-    adsr.setRelease (getValue (proc.release));
+    adsr.setAttack (getValue (proc.adsrParams.attack));
+    adsr.setDecay (getValue (proc.adsrParams.decay));
+    adsr.setSustainLevel (getValue (proc.adsrParams.sustain));
+    adsr.setRelease (getValue (proc.adsrParams.release));
 }
