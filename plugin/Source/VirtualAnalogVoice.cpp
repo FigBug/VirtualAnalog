@@ -14,6 +14,14 @@ VirtualAnalogVoice::VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, BandLimi
 
 void VirtualAnalogVoice::noteStarted()
 {
+    auto note = getCurrentlyPlayingNote();
+    proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
+    proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
+    proc.modMatrix.setPolyValue (*this, proc.modSrcPressure, note.pressure.asUnsignedFloat());
+    
+    updateParams (0);
+    snapParams();
+    
     for (auto& osc : oscillators)
         osc.noteOn();
 
@@ -48,6 +56,18 @@ void VirtualAnalogVoice::noteStopped (bool allowTailOff)
     
     if (! allowTailOff)
         clearCurrentNote();
+}
+
+void VirtualAnalogVoice::notePressureChanged()
+{
+    auto note = getCurrentlyPlayingNote();
+    proc.modMatrix.setPolyValue (*this, proc.modSrcPressure, note.pressure.asUnsignedFloat());
+}
+
+void VirtualAnalogVoice::noteTimbreChanged()
+{
+    auto note = getCurrentlyPlayingNote();
+    proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
 }
 
 void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
@@ -95,11 +115,15 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     // Copy output to synth
     outputBuffer.copyFrom (0, startSample, buffer, 0, 0, numSamples);
     outputBuffer.copyFrom (1, startSample, buffer, 1, 0, numSamples);
+    
+    finishBlock (numSamples);
 }
 
 void VirtualAnalogVoice::updateParams (int blockSize)
 {
     auto note = getCurrentlyPlayingNote();
+    
+    proc.modMatrix.setPolyValue (*this, proc.modSrcNote, note.initialNote / 127.0f);
 
     for (int i = 0; i < numOSCs; i++)
     {
@@ -139,6 +163,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         filters[i].setSlope ((Filter::Slope)int (proc.filterParams[i].slope->getProcValue()));
         filters[i].setParams (f, q);
 
+        proc.modMatrix.setPolyValue (*this, proc.modSrcFilter[i], filterADSRs[i].getOutput());
+        
         filterADSRs[i].process (blockSize);
     }
 
@@ -148,6 +174,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         modADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
         modADSRs[i].setDecay (getValue (proc.filterParams[i].attack));
         modADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
+        
+        proc.modMatrix.setPolyValue (*this, proc.modSrcEvn[i], modADSRs[i].getOutput());
 
         modADSRs[i].process (blockSize);
     }
@@ -171,6 +199,9 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         params.fade      = getValue (proc.lfoParams[i].fade);
 
         modLFOs[i].setParameters (params);
+        
+        proc.modMatrix.setPolyValue (*this, proc.modSrcLFO[i], modLFOs[i].getOutput());
+        
         modLFOs[i].process (blockSize);
     }
 

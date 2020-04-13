@@ -92,8 +92,8 @@ void VirtualAnalogAudioProcessor::ADSRParams::setup (VirtualAnalogAudioProcessor
 //==============================================================================
 VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 {
-    synth.enableLegacyMode();
-    synth.setVoiceStealingEnabled (true);
+    enableLegacyMode();
+    setVoiceStealingEnabled (true);
 
     for (int i = 0; i < numElementsInArray (oscParams); i++)
         oscParams[i].setup (*this, i);
@@ -113,7 +113,7 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
     {
         auto voice = new VirtualAnalogVoice (*this, bandLimitedLookupTables);
         modMatrix.addVoice (voice);
-        synth.addVoice (voice);
+        addVoice (voice);
     }
 
     setupModMatrix();
@@ -129,7 +129,6 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     modSrcPressure  = modMatrix.addMonoModSource ("mpePressure");
     modSrcTimbre    = modMatrix.addMonoModSource ("mpeTimbre");
 
-    modSrcModWheel  = modMatrix.addMonoModSource ("modWheel");
     modScrPitchBend = modMatrix.addMonoModSource ("pitchBend");
 
     modSrcNote      = modMatrix.addPolyModSource ("note");
@@ -162,7 +161,7 @@ void VirtualAnalogAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     GinProcessor::prepareToPlay (sampleRate, samplesPerBlock);
     
     bandLimitedLookupTables.setSampleRate (sampleRate);
-    synth.setCurrentPlaybackSampleRate (sampleRate);
+    setCurrentPlaybackSampleRate (sampleRate);
 
     modMatrix.setSampleRate (sampleRate);
 }
@@ -184,9 +183,10 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     while (todo > 0)
     {
         int thisBlock = std::min (todo, 32);
-        synth.renderNextBlock (buffer, midi, pos, thisBlock);
 
         updateParams (thisBlock);
+        renderNextBlock (buffer, midi, pos, thisBlock);
+        modMatrix.finishBlock (thisBlock);
         
         pos += thisBlock;
         todo -= thisBlock;
@@ -218,6 +218,17 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
         modLFOs[i].setParameters (params);
         modLFOs[i].process (blockSize);
     }
+}
+
+void VirtualAnalogAudioProcessor::handleMidiEvent (const MidiMessage& m)
+{
+    if (m.isPitchWheel())
+        modMatrix.setMonoValue (modScrPitchBend, float (m.getPitchWheelValue()) / 0x2000 - 1.0f);
+}
+
+void VirtualAnalogAudioProcessor::handleController ([[maybe_unused]] int ch, int num, int val)
+{
+    modMatrix.setMonoValue (modSrcCC[num], val / 127.0f);
 }
 
 //==============================================================================

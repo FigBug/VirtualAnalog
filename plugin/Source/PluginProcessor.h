@@ -5,7 +5,8 @@
 #include "VirtualAnalogVoice.h"
 
 //==============================================================================
-class VirtualAnalogAudioProcessor : public gin::GinProcessor                                    
+class VirtualAnalogAudioProcessor : public gin::GinProcessor,
+                                    public MPESynthesiser
 {
 public:
     //==============================================================================
@@ -26,9 +27,12 @@ public:
     void setupModMatrix();
 
     gin::BandLimitedLookupTables bandLimitedLookupTables;
-    MPESynthesiser synth;
 
     //==============================================================================
+    void handleMidiEvent (const MidiMessage& m) override;
+    void handleController (int ch, int num, int val) override;
+    //==============================================================================
+    
     struct OSCParams
     {
         gin::Parameter::Ptr wave, voices, tune, finetune, level, pulsewidth,
@@ -68,7 +72,7 @@ public:
     };
 
     //==============================================================================
-    int modSrcPressure = 0, modSrcTimbre = 0, modSrcModWheel = 0, modScrPitchBend = 0,
+    int modSrcPressure = 0, modSrcTimbre = 0, modScrPitchBend = 0,
         modSrcNote = 0, modSrcVelocity = 0;
 
     int modSrcCC[119]                                   = {0};

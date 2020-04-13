@@ -19,9 +19,9 @@ public:
     void noteStarted() override;
     void noteStopped (bool allowTailOff) override;
 
-    void notePressureChanged() override     {}
+    void notePressureChanged() override;
+    void noteTimbreChanged() override;
     void notePitchbendChanged() override    {}
-    void noteTimbreChanged() override       {}
     void noteKeyStateChanged() override     {}
     
     void setCurrentSampleRate (double newRate) override;
