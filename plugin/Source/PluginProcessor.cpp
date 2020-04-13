@@ -4,13 +4,28 @@
 
 using namespace gin;
 
+static String textFunction (const Parameter&, float v)
+{
+    switch ((Wave)int (v))
+    {
+        case Wave::silence:     return "Off";
+        case Wave::sine:        return "Sine";
+        case Wave::triangle:    return "Tri";
+        case Wave::sawUp:       return "Saw U";
+        case Wave::sawDown:     return "Saw D";
+        case Wave::pulse:       return "Pulse";
+        case Wave::square:      return "Square";
+        case Wave::noise:       return "Noise";
+    }
+}
+
 //==============================================================================
 void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor& p, int idx)
 {
     String id = "osc" + String (idx + 1);
     String nm = "OSC" + String (idx + 1) + " ";
 
-    wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 0.0, 8.0, 1.0, 1.0 }, idx == 0 ? 2.0 : 0.0, {});
+    wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 0.0, 7.0, 1.0, 1.0 }, idx == 0 ? 2.0 : 0.0, {}, textFunction);
     voices     = p.addIntParam (id + "voices",     nm + "Voices",      "Voices",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
     finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine Tune", "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
@@ -164,6 +179,9 @@ void VirtualAnalogAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     setCurrentPlaybackSampleRate (sampleRate);
 
     modMatrix.setSampleRate (sampleRate);
+
+    for (auto& l : modLFOs)
+        l.setSampleRate (sampleRate);
 }
 
 void VirtualAnalogAudioProcessor::releaseResources()

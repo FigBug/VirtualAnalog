@@ -7,20 +7,13 @@ using namespace gin;
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
     : GinAudioProcessorEditor (p, 60, 100), proc (p)
 {
-    for (auto pp : p.getPluginParameters())
-    {
-        ParamComponent* pc;
+    addAndMakeVisible (header);
+    addAndMakeVisible (oscillators[0]);
+    addAndMakeVisible (oscillators[1]);
+    addAndMakeVisible (oscillators[2]);
+    addAndMakeVisible (oscillators[3]);
 
-        if (pp->isOnOff())
-            pc = new Switch (pp);
-        else
-            pc = new Knob (pp);
-
-        addAndMakeVisible (pc);
-        controls.add (pc);
-    }
-
-    setGridSize (9, 7);
+    setGridSize (12, 7);
 }
 
 VirtualAnalogAudioProcessorEditor::~VirtualAnalogAudioProcessorEditor()
@@ -37,10 +30,9 @@ void VirtualAnalogAudioProcessorEditor::resized()
 {
     GinAudioProcessorEditor::resized ();
 
-    int idx = 0;
-    for (auto pp : proc.getPluginParameters())
-    {
-        componentForParam (*pp)->setBounds (getGridArea (idx % 9, idx / 9));
-        idx++;
-    }
+    header.setBounds (getGridArea (0, 0, 12, 1));
+    oscillators[0].setBounds (getGridArea (0, 1, 3, 2));
+    oscillators[1].setBounds (getGridArea (3, 1, 3, 2));
+    oscillators[2].setBounds (getGridArea (6, 1, 3, 2));
+    oscillators[3].setBounds (getGridArea (9, 1, 3, 2));
 }
