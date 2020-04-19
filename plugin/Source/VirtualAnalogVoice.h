@@ -11,8 +11,8 @@ class VirtualAnalogVoice : public MPESynthesiserVoice,
 public:
     static const int numOSCs    = 4;
     static const int numFilters = 2;
-    static const int numADSRs   = 2;
-    static const int numLFOs    = 4;
+    static const int numENVs    = 2;
+    static const int numLFOs    = 2;
 
     VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, gin::BandLimitedLookupTables& bandLimitedLookupTables);
     
@@ -45,7 +45,7 @@ private:
     gin::Filter filters[numFilters];
     gin::ADSR filterADSRs[numFilters];
     
-    gin::ADSR modADSRs[numADSRs];
+    gin::ADSR modADSRs[numENVs];
     gin::LFO modLFOs[numLFOs];
 
     gin::AnalogADSR adsr;

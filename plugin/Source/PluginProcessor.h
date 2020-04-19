@@ -79,13 +79,13 @@ public:
     int modSrcMonoLFO[VirtualAnalogVoice::numLFOs]      = {0};
     int modSrcLFO[VirtualAnalogVoice::numLFOs]          = {0};
     int modSrcFilter[VirtualAnalogVoice::numFilters]    = {0};
-    int modSrcEvn[VirtualAnalogVoice::numADSRs]         = {0};
+    int modSrcEvn[VirtualAnalogVoice::numENVs]         = {0};
 
     //==============================================================================
 
     OSCParams oscParams[VirtualAnalogVoice::numOSCs];
     FilterParams filterParams[VirtualAnalogVoice::numFilters];
-    EnvParams envParams[VirtualAnalogVoice::numADSRs];
+    EnvParams envParams[VirtualAnalogVoice::numENVs];
     LFOParams lfoParams[VirtualAnalogVoice::numLFOs];
 
     ADSRParams adsrParams;

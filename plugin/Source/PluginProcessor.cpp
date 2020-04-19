@@ -10,9 +10,9 @@ static String textFunction (const Parameter&, float v)
     {
         case Wave::silence:     return "Off";
         case Wave::sine:        return "Sine";
-        case Wave::triangle:    return "Tri";
-        case Wave::sawUp:       return "Saw U";
-        case Wave::sawDown:     return "Saw D";
+        case Wave::triangle:    return "Triangle";
+        case Wave::sawUp:       return "Saw (Up)";
+        case Wave::sawDown:     return "Saw (Down)";
         case Wave::pulse:       return "Pulse";
         case Wave::square:      return "Square";
         case Wave::noise:       return "Noise";
@@ -28,7 +28,7 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
     wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 0.0, 7.0, 1.0, 1.0 }, idx == 0 ? 2.0 : 0.0, {}, textFunction);
     voices     = p.addIntParam (id + "voices",     nm + "Voices",      "Voices",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
-    finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine Tune", "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
+    finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine",      "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
     level      = p.addExtParam (id + "level",      nm + "Level",       "Level",     "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
     pulsewidth = p.addExtParam (id + "pulsewidth", nm + "Pulse Width", "PW",        "", { 1.0, 99.0, 0.0, 1.0 }, 50.0, {});
     detune     = p.addExtParam (id + "detune",     nm + "Detune",      "Detune",    "", { 0.0, 0.5, 0.0, 1.0 }, 0.0, {});
@@ -141,8 +141,8 @@ VirtualAnalogAudioProcessor::~VirtualAnalogAudioProcessor()
 //==============================================================================
 void VirtualAnalogAudioProcessor::setupModMatrix()
 {
-    modSrcPressure  = modMatrix.addMonoModSource ("mpePressure");
-    modSrcTimbre    = modMatrix.addMonoModSource ("mpeTimbre");
+    modSrcPressure  = modMatrix.addPolyModSource ("mpePressure");
+    modSrcTimbre    = modMatrix.addPolyModSource ("mpeTimbre");
 
     modScrPitchBend = modMatrix.addMonoModSource ("pitchBend");
 
@@ -161,7 +161,7 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     for (int i = 0; i < VirtualAnalogVoice::numFilters; i++)
         modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("fenv%d", i));
 
-    for (int i = 0; i < VirtualAnalogVoice::numADSRs; i++)
+    for (int i = 0; i < VirtualAnalogVoice::numENVs; i++)
         modSrcEvn[i] = modMatrix.addPolyModSource (String::formatted ("env%d", i));
 
     for (auto pp : getPluginParameters())
@@ -240,6 +240,8 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
 
 void VirtualAnalogAudioProcessor::handleMidiEvent (const MidiMessage& m)
 {
+	MPESynthesiser::handleMidiEvent (m);
+	
     if (m.isPitchWheel())
         modMatrix.setMonoValue (modScrPitchBend, float (m.getPitchWheelValue()) / 0x2000 - 1.0f);
 }

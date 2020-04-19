@@ -111,10 +111,10 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     
     if (adsr.getState() == AnalogADSR::State::idle)
         clearCurrentNote();
-    
+
     // Copy output to synth
-    outputBuffer.copyFrom (0, startSample, buffer, 0, 0, numSamples);
-    outputBuffer.copyFrom (1, startSample, buffer, 1, 0, numSamples);
+    outputBuffer.addFrom (0, startSample, buffer, 0, 0, numSamples);
+    outputBuffer.addFrom (1, startSample, buffer, 1, 0, numSamples);
     
     finishBlock (numSamples);
 }
@@ -168,7 +168,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         filterADSRs[i].process (blockSize);
     }
 
-    for (int i = 0; i < numADSRs; i++)
+    for (int i = 0; i < numENVs; i++)
     {
         modADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
         modADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));

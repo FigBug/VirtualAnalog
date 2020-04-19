@@ -5,15 +5,21 @@ using namespace gin;
 
 //==============================================================================
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
-    : GinAudioProcessorEditor (p, 60, 100), proc (p)
+    : GinAudioProcessorEditor (p, 50, 50 + 15), proc (p)
 {
-    addAndMakeVisible (header);
-    addAndMakeVisible (oscillators[0]);
-    addAndMakeVisible (oscillators[1]);
-    addAndMakeVisible (oscillators[2]);
-    addAndMakeVisible (oscillators[3]);
+    gin::addAndMakeVisible (*this, { &commonHeader, &common, &unisonHeader, &unison });
 
-    setGridSize (12, 7);
+    gin::addAndMakeVisible (*this, { &oscHeaders[0], &oscHeaders[1], &oscHeaders[2], &oscHeaders[3] });
+    gin::addAndMakeVisible (*this, { &oscillators[0], &oscillators[1], &oscillators[2], &oscillators[3] });
+
+    gin::addAndMakeVisible (*this, { &filterHeaders[0], &filterHeaders[1] });
+    gin::addAndMakeVisible (*this, { &filters[0], &filters[1] });
+
+    gin::addAndMakeVisible (*this, { &adsrHeader, &adsr });
+    gin::addAndMakeVisible (*this, { &modulationHeader, &modulation });
+    gin::addAndMakeVisible (*this, { &effectsHeader, &effects });
+
+    setGridSize (12, 8, 0, 5 * 25);
 }
 
 VirtualAnalogAudioProcessorEditor::~VirtualAnalogAudioProcessorEditor()
@@ -24,15 +30,75 @@ VirtualAnalogAudioProcessorEditor::~VirtualAnalogAudioProcessorEditor()
 void VirtualAnalogAudioProcessorEditor::paint (Graphics& g)
 {
     GinAudioProcessorEditor::paint (g);
+
+    g.setColour (Colours::white.withAlpha (0.2f));
+
+    auto rc = getFullGridArea();
+    g.drawRect (rc.expanded (1));
 }
 
 void VirtualAnalogAudioProcessorEditor::resized()
 {
     GinAudioProcessorEditor::resized ();
 
-    header.setBounds (getGridArea (0, 0, 12, 1));
-    oscillators[0].setBounds (getGridArea (0, 1, 3, 2));
-    oscillators[1].setBounds (getGridArea (3, 1, 3, 2));
-    oscillators[2].setBounds (getGridArea (6, 1, 3, 2));
-    oscillators[3].setBounds (getGridArea (9, 1, 3, 2));
+    auto rc = getFullGridArea();
+
+    int hh = 25;
+
+    int cx = getGridWidth();
+    int cy = getGridHeight();
+
+    // Common and Unison box
+    {
+        auto rHeaders = rc.removeFromTop (hh);
+        auto rControls = rc.removeFromTop (cy);
+
+        commonHeader.setBounds (rHeaders.removeFromLeft (cx * 8));
+        common.setBounds (rControls.removeFromLeft (cx * 8));
+
+        unisonHeader.setBounds (rHeaders.removeFromLeft (cx * 4));
+        unison.setBounds (rControls.removeFromLeft (cx * 4));
+    }
+
+    // Oscillators
+    {
+        auto rHeaders = rc.removeFromTop (hh);
+        for (auto& c : oscHeaders)
+            c.setBounds (rHeaders.removeFromLeft (cx * 3));
+
+        auto rOscs = rc.removeFromTop (cy * 2);
+        for (auto& c : oscillators)
+            c.setBounds (rOscs.removeFromLeft (cx * 3));
+    }
+
+    // Filters
+    {
+        auto rHeaders = rc.removeFromTop (hh);
+        for (auto& c : filterHeaders)
+            c.setBounds (rHeaders.removeFromLeft (cx * 6));
+
+        auto rFilters = rc.removeFromTop (cy * 2);
+        for (auto& c : filters)
+            c.setBounds (rFilters.removeFromLeft (cx * 6));
+    }
+
+    // ADSR and mod
+    {
+        auto rHeaders = rc.removeFromTop (hh);
+        adsrHeader.setBounds (rHeaders.removeFromLeft (cx * 3));
+        modulationHeader.setBounds (rHeaders.removeFromLeft (cx * 9));
+
+        auto rFilters = rc.removeFromTop (cy * 2);
+        adsr.setBounds (rFilters.removeFromLeft (cx * 3));
+        modulation.setBounds (rFilters.removeFromLeft (cx * 9));
+    }
+
+    // Effects
+    {
+        auto rHeaders = rc.removeFromTop (hh);
+        effectsHeader.setBounds (rHeaders.removeFromLeft (cx * 12));
+
+        auto rFilters = rc.removeFromTop (cy * 1);
+        effects.setBounds (rFilters.removeFromLeft (cx * 12));
+    }
 }

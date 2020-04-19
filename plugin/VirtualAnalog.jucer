@@ -7,6 +7,7 @@
               cppLanguageStandard="14" pluginChannelConfigs="{0,2}">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
+      <FILE id="f12Jxy" name="Boxes.h" compile="0" resource="0" file="Source/Boxes.h"/>
       <FILE id="hVjqti" name="VirtualAnalogVoice.cpp" compile="1" resource="0"
             file="Source/VirtualAnalogVoice.cpp"/>
       <FILE id="BmWCuH" name="VirtualAnalogVoice.h" compile="0" resource="0"
