@@ -4,7 +4,7 @@
 
 using namespace gin;
 
-static String textFunction (const Parameter&, float v)
+static String waveTextFunction (const Parameter&, float v)
 {
     switch ((Wave)int (v))
     {
@@ -19,13 +19,23 @@ static String textFunction (const Parameter&, float v)
     }
 }
 
+String enableTextFunction (const Parameter&, float v)
+{
+    return v > 0.0f ? "On" : "Off";
+}
+
+String durationTextFunction (const Parameter&, float v)
+{
+    return NoteDuration::getNoteDurations()[size_t (v)].getName();
+}
+
 //==============================================================================
 void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor& p, int idx)
 {
     String id = "osc" + String (idx + 1);
     String nm = "OSC" + String (idx + 1) + " ";
 
-    wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 0.0, 7.0, 1.0, 1.0 }, idx == 0 ? 2.0 : 0.0, {}, textFunction);
+    wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 0.0, 7.0, 1.0, 1.0 }, idx == 0 ? 2.0 : 0.0, {}, waveTextFunction);
     voices     = p.addIntParam (id + "voices",     nm + "Voices",      "Voices",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
     finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine",      "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
@@ -105,6 +115,119 @@ void VirtualAnalogAudioProcessor::ADSRParams::setup (VirtualAnalogAudioProcessor
 }
 
 //==============================================================================
+void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    mode    = p.addIntParam ("mode",    "Mode",     "",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
+    legato  = p.addExtParam ("legato",  "Legato",   "",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
+    level   = p.addExtParam ("level",   "Level",    "",   "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
+    voices  = p.addIntParam ("voices",  "Voices",   "",   "", { 0.0, 82.0, 1.0, 1.0 }, 32.0, {});
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::ChorusParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    enable = p.addIntParam ("chEnable",    "Enable",  "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    depth  = p.addExtParam ("chDepth",     "Depth",   "",   "ms", {0.1f, 20.0f, 0.0f, 1.0f}, 1.0f, {});
+    speed  = p.addExtParam ("chSpeed",     "Speed",   "",   "Hz", {0.1f, 10.0f, 0.0f, 1.0f}, 3.0f, {});
+    width  = p.addExtParam ("chWidth",     "Width",   "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.5f, {});
+    mix    = p.addExtParam ("chMix",       "Mix",     "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::DistortionParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    enable = p.addIntParam ("dsEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    amount = p.addExtParam ("dsAmount",    "Amount",     "",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::EQParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    float maxFreq = float (getMidiNoteFromHertz (20000.0));
+    float d1 = float (getMidiNoteFromHertz (80.0));
+    float d2 = float (getMidiNoteFromHertz (3000.0));
+    float d3 = float (getMidiNoteFromHertz (5000.0));
+    float d4 = float (getMidiNoteFromHertz (17000.0));
+
+    enable   = p.addIntParam ("eqEnable",    "Enable",      "",     "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+
+    loFreq   = p.addExtParam ("eqLoFreq",    "Lo Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d1, {});
+    loGain   = p.addExtParam ("eqLoQ",       "Lo Q",        "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    loQ      = p.addExtParam ("eqLoGain",    "Lo Gain",     "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+
+    mid1Freq = p.addExtParam ("eqM1Freq",    "Min 1 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d2, {});
+    mid1Gain = p.addExtParam ("eqM1Q",       "Min 1 Q",     "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    mid1Q    = p.addExtParam ("eqM1Gain",    "Min 1 Gain",  "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+
+    mid2Freq = p.addExtParam ("eqM2Freq",    "Mid 2 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d3, {});
+    mid2Gain = p.addExtParam ("eqM2Q",       "Mid 2 Q",     "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    mid2Q    = p.addExtParam ("eqM2Gain",    "Mid 2 Gain",  "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+
+    hiFreq   = p.addExtParam ("eqHiFreq",    "Hi Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d4, {});
+    hiGain   = p.addExtParam ("eqHiQ",       "Hi Q",        "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    hiQ      = p.addExtParam ("eqHiGain",    "Hi Gain",     "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+
+    loFreq->conversionFunction   = [] (float in) { return Decibels::decibelsToGain (in); };
+    mid1Freq->conversionFunction = [] (float in) { return Decibels::decibelsToGain (in); };
+    mid2Freq->conversionFunction = [] (float in) { return Decibels::decibelsToGain (in); };
+    hiFreq->conversionFunction   = [] (float in) { return Decibels::decibelsToGain (in); };
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::CompressorParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    enable    = p.addIntParam ("cpEnable",    "Enable",    "", "",     { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+
+    attack    = p.addExtParam ("cpAttack",    "Attack",    "", "ms",   { 1.0f,   200.0f, 0.0f, 0.4f},    1.0f, 0.1f);
+    release   = p.addExtParam ("cpRelease",   "Release",   "", "ms",   { 1.0f,  2000.0f, 0.0f, 0.4f},    5.0f, 0.1f);
+    ratio     = p.addExtParam ("cpRatio",     "Ratio",     "", "",     { 1.0f,    30.0f, 0.0f, 0.4f},    5.0f, 0.1f);
+    threshold = p.addExtParam ("cpThreshold", "Threshold", "", "",     { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
+    gain      = p.addExtParam ("cpGain",      "Gain",      "", "",     { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
+
+    attack->conversionFunction  = [] (float in) { return in / 1000.0; };
+    release->conversionFunction = [] (float in) { return in / 1000.0; };
+    gain->conversionFunction    = [] (float in) { return Decibels::decibelsToGain (in); };
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::DelayParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    enable = p.addIntParam ("rvEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+
+    float mxd = float (NoteDuration::getNoteDurations().size()) - 1.0f;
+
+    sync  = p.addExtParam ("dlSync",  "Sync",      "", "",   {   0.0f,   1.0f, 1.0f, 1.0f},    0.0f, 0.0f, enableTextFunction);
+    time  = p.addExtParam ("dlTime",  "Delay",     "", "",   {   0.0f, 120.0f, 0.0f, 0.3f},    1.0f, 0.0f);
+    beat  = p.addExtParam ("dlBeat",  "Delay",     "", "",   {   0.0f,    mxd, 1.0f, 1.0f},   13.0f, 0.0f, durationTextFunction);
+    fb    = p.addExtParam ("dlFb",    "Feedback",  "", "dB", {-100.0f,   0.0f, 0.0f, 5.0f},  -10.0f, 0.1f);
+    cf    = p.addExtParam ("dlCf",    "Crossfeed", "", "dB", {-100.0f,   0.0f, 0.0f, 5.0f}, -100.0f, 0.1f);
+    mix   = p.addExtParam ("dlMix",   "Mix",       "", "%",  {   0.0f, 100.0f, 0.0f, 1.0f},    0.0f, 0.1f);
+
+    delay = p.addIntParam ("dlDelay", "Delay",     "", "",   {   0.0f, 120.0f, 0.0f, 1.0f},    1.0f, {0.2f, SmoothingType::eased});
+
+    fb->conversionFunction  = [] (float in) { return Decibels::decibelsToGain (in); };
+    cf->conversionFunction  = [] (float in) { return Decibels::decibelsToGain (in); };
+    mix->conversionFunction = [] (float in) { return in / 100.0f; };
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::ReverbParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    enable = p.addIntParam ("rvEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::LimiterParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    enable    = p.addIntParam ("lmEnable",    "Enable",    "", "",     { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+
+    attack    = p.addExtParam ("lmAttack",    "Attack",    "", "ms",   { 1.0f,     5.0f, 0.0f, 0.4f},    1.0f, 0.1f);
+    release   = p.addExtParam ("lmRelease",   "Release",   "", "ms",   { 1.0f,   100.0f, 0.0f, 0.4f},    5.0f, 0.1f);
+    threshold = p.addExtParam ("lmThreshold", "Threshold", "", "",     { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
+    gain      = p.addExtParam ("lmGain",      "Gain",      "", "",     { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
+}
+
+//==============================================================================
 VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 {
     enableLegacyMode();
@@ -123,6 +246,14 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
         lfoParams[i].setup (*this, i);
 
     adsrParams.setup (*this);
+    globalParams.setup (*this);
+    chorusParams.setup (*this);
+    distortionParams.setup (*this);
+    eqParams.setup (*this);
+    compressorParams.setup (*this);
+    delayParams.setup (*this);
+    reverbParams.setup (*this);
+    limiterParams.setup (*this);
 
     for (int i = 0; i < 36; i++)
     {
@@ -180,6 +311,13 @@ void VirtualAnalogAudioProcessor::prepareToPlay (double sampleRate, int samplesP
 
     modMatrix.setSampleRate (sampleRate);
 
+    stereoDelay.setSampleRate (sampleRate);
+    compressor.setSampleRate (sampleRate);
+    limiter.setSampleRate (sampleRate);
+
+    eq.setNumChannels (2);
+    eq.setSampleRate (sampleRate);
+
     for (auto& l : modLFOs)
         l.setSampleRate (sampleRate);
 }
@@ -203,7 +341,12 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
         int thisBlock = std::min (todo, 32);
 
         updateParams (thisBlock);
+
         renderNextBlock (buffer, midi, pos, thisBlock);
+
+        auto slice = sliceBuffer (buffer, pos, thisBlock);
+        applyEffects (slice);
+
         modMatrix.finishBlock (thisBlock);
         
         pos += thisBlock;
@@ -213,8 +356,34 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     playHead = nullptr;
 }
 
+void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)
+{
+    // Apply Chorus
+    
+    // Apply Distortion
+
+    // Apply EQ
+    if (eqParams.enable->isOn())
+        eq.process (buffer);
+
+    // Apply Compressor
+    if (compressorParams.enable->isOn())
+        compressor.process (buffer);
+
+    // Apply Delay
+    if (delayParams.enable->isOn())
+        stereoDelay.process (buffer);
+
+    // Apply Reverb
+
+    // Apply Limiter
+    if (limiterParams.enable->isOn())
+        limiter.process (buffer);
+}
+
 void VirtualAnalogAudioProcessor::updateParams (int blockSize)
 {
+    // Update Mono LFOs
     for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
     {
         LFO::Parameters params;
@@ -236,6 +405,64 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
         modLFOs[i].setParameters (params);
         modLFOs[i].process (blockSize);
     }
+
+    // Update Chorus
+    // Update Distortion
+
+    // Update EQ
+    if (eqParams.enable->isOn())
+    {
+        eq.setParams (0, EQ::lowshelf,
+                      modMatrix.getValue (eqParams.loFreq),
+                      modMatrix.getValue (eqParams.loQ),
+                      modMatrix.getValue (eqParams.loGain));
+    }
+
+    // Update Compressor
+    if (compressorParams.enable->isOn())
+    {
+        compressor.setInputGain (1.0f);
+        compressor.setOutputGain (modMatrix.getValue (compressorParams.gain));
+        compressor.setParams (modMatrix.getValue (compressorParams.attack),
+                              modMatrix.getValue (compressorParams.release),
+                              modMatrix.getValue (compressorParams.threshold),
+                              modMatrix.getValue (compressorParams.ratio),
+                              6);
+    }
+
+    // Update Delay
+    if (delayParams.enable->isOn())
+    {
+        if (delayParams.sync->isOn())
+        {
+            auto& duration = NoteDuration::getNoteDurations()[(size_t)delayParams.beat->getUserValueInt()];
+            delayParams.delay->setUserValue (duration.toSeconds (getPlayHead()));
+        }
+        else
+        {
+            delayParams.delay->setUserValue (delayParams.time->getUserValue());
+        }
+
+        stereoDelay.setParams (modMatrix.getValue (delayParams.delay),
+                               modMatrix.getValue (delayParams.mix),
+                               modMatrix.getValue (delayParams.fb),
+                               modMatrix.getValue (delayParams.cf));
+    }
+
+
+    // Update Reverb
+
+    // Update Limiter
+    if (limiterParams.enable->isOn())
+    {
+        limiter.setInputGain (1.0f);
+        limiter.setOutputGain (modMatrix.getValue (limiterParams.gain));
+        limiter.setParams (modMatrix.getValue (limiterParams.attack),
+                           modMatrix.getValue (limiterParams.release),
+                           modMatrix.getValue (limiterParams.threshold),
+                           100, 6);
+    }
+
 }
 
 void VirtualAnalogAudioProcessor::handleMidiEvent (const MidiMessage& m)

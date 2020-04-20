@@ -21,7 +21,7 @@ public:
     {
         for (int i = 0; i < 4; i++)
         {
-            auto osc = proc.oscParams[i];
+            auto& osc = proc.oscParams[i];
 
             add (voices[i] = new gin::Knob (osc.voices));
             add (detune[i] = new gin::Knob (osc.detune));
