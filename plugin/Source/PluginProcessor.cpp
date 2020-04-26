@@ -126,11 +126,15 @@ void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcess
 //==============================================================================
 void VirtualAnalogAudioProcessor::ChorusParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable = p.addIntParam ("chEnable",    "Enable",  "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable = p.addIntParam ("chEnable",    "Enable",  "",   "",   { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    delay  = p.addExtParam ("chDepth",     "Depth",   "",   "ms", {0.1f, 30.0f, 0.0f, 1.0f}, 1.0f, {});
     depth  = p.addExtParam ("chDepth",     "Depth",   "",   "ms", {0.1f, 20.0f, 0.0f, 1.0f}, 1.0f, {});
-    speed  = p.addExtParam ("chSpeed",     "Speed",   "",   "Hz", {0.1f, 10.0f, 0.0f, 1.0f}, 3.0f, {});
-    width  = p.addExtParam ("chWidth",     "Width",   "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.5f, {});
-    mix    = p.addExtParam ("chMix",       "Mix",     "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
+    rate   = p.addExtParam ("chSpeed",     "Speed",   "",   "Hz", {0.1f, 10.0f, 0.0f, 1.0f}, 3.0f, {});
+    width  = p.addExtParam ("chWidth",     "Width",   "",   "",   {0.0f, 1.0f,  0.0f, 1.0f}, 0.5f, {});
+    mix    = p.addExtParam ("chMix",       "Mix",     "",   "",   {0.0f, 1.0f,  0.0f, 1.0f}, 0.0f, {});
+
+    delay->conversionFunction = [] (float in) { return in / 1000.0f; };
+    depth->conversionFunction = [] (float in) { return in / 1000.0f; };
 }
 
 //==============================================================================
@@ -213,7 +217,13 @@ void VirtualAnalogAudioProcessor::DelayParams::setup (VirtualAnalogAudioProcesso
 //==============================================================================
 void VirtualAnalogAudioProcessor::ReverbParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable = p.addIntParam ("rvEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable     = p.addIntParam ("rvEnable",   "Enable",  "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+
+    damping    = p.addExtParam ("rvbDamping", "Damping", "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
+    freezeMode = p.addExtParam ("rvbFreeze",  "Freeze",  "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
+    roomSize   = p.addExtParam ("rvbSize",    "Size",    "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
+    width      = p.addExtParam ("rvbWidth",   "Width",   "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
+    mix        = p.addExtParam ("rvbMix",     "Mix",     "",   "", {0.0f, 1.0f,    0.0f, 1.0f}, 0.0f, {});
 }
 
 //==============================================================================
@@ -318,6 +328,8 @@ void VirtualAnalogAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     eq.setNumChannels (2);
     eq.setSampleRate (sampleRate);
 
+    reverb.setSampleRate (sampleRate);
+
     for (auto& l : modLFOs)
         l.setSampleRate (sampleRate);
 }
@@ -359,6 +371,8 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
 void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)
 {
     // Apply Chorus
+    if (chorusParams.enable->isOn())
+        chorus.process (buffer);
     
     // Apply Distortion
 
@@ -375,6 +389,8 @@ void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)
         stereoDelay.process (buffer);
 
     // Apply Reverb
+    if (reverbParams.enable->isOn())
+        reverb.processStereo (buffer.getWritePointer (0), buffer.getWritePointer (1), buffer.getNumSamples ());
 
     // Apply Limiter
     if (limiterParams.enable->isOn())
@@ -407,6 +423,15 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
     }
 
     // Update Chorus
+    if (chorusParams.enable->isOn())
+    {
+        chorus.setParams (modMatrix.getValue (chorusParams.delay),
+                          modMatrix.getValue (chorusParams.rate),
+                          modMatrix.getValue (chorusParams.depth),
+                          modMatrix.getValue (chorusParams.width),
+                          modMatrix.getValue (chorusParams.mix));
+    }
+
     // Update Distortion
 
     // Update EQ
@@ -451,6 +476,22 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
 
 
     // Update Reverb
+    if (reverbParams.enable->isOn())
+    {
+        Reverb::Parameters p;
+
+        auto mix = modMatrix.getValue (reverbParams.mix);
+        WetDryMix wetDry (mix);
+
+        p.damping    = modMatrix.getValue (reverbParams.damping);
+        p.freezeMode = modMatrix.getValue (reverbParams.freezeMode);
+        p.roomSize   = modMatrix.getValue (reverbParams.roomSize);
+        p.width      = modMatrix.getValue (reverbParams.width);
+        p.dryLevel   = wetDry.dryGain;
+        p.wetLevel   = wetDry.wetGain;
+
+        reverb.setParameters (p);
+    }
 
     // Update Limiter
     if (limiterParams.enable->isOn())

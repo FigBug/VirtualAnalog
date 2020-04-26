@@ -110,7 +110,7 @@ public:
     {
         ChorusParams() = default;
 
-        gin::Parameter::Ptr enable, time, depth, speed, width, mix;
+        gin::Parameter::Ptr enable, delay, rate, depth, width, mix;
 
         void setup (VirtualAnalogAudioProcessor& p);
 
@@ -169,7 +169,7 @@ public:
     {
         ReverbParams() = default;
 
-        gin::Parameter::Ptr enable;
+        gin::Parameter::Ptr enable, damping, freezeMode, roomSize, width, mix;
 
         void setup (VirtualAnalogAudioProcessor& p);
 
@@ -216,10 +216,12 @@ public:
     LimiterParams limiterParams;
 
     //==============================================================================
+    gin::Modulation chorus { 0.5f };
     gin::StereoDelay stereoDelay { 120.1 };
     gin::Dynamics compressor;
     gin::Dynamics limiter;
     gin::EQ eq {4};
+    Reverb reverb;
 
     //==============================================================================
     gin::ModMatrix modMatrix;
