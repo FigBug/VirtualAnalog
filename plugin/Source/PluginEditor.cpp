@@ -19,7 +19,7 @@ VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAna
     gin::addAndMakeVisible (*this, { &modulationHeader, &modulation });
     gin::addAndMakeVisible (*this, { &effectsHeader, &effects });
 
-    setGridSize (12, 8, 0, 5 * 25);
+    setGridSize (14, 8, 0, 4 * 25);
 }
 
 VirtualAnalogAudioProcessorEditor::~VirtualAnalogAudioProcessorEditor()
@@ -48,57 +48,51 @@ void VirtualAnalogAudioProcessorEditor::resized()
     int cx = getGridWidth();
     int cy = getGridHeight();
 
-    // Common and Unison box
-    {
-        auto rHeaders = rc.removeFromTop (hh);
-        auto rControls = rc.removeFromTop (cy);
-
-        commonHeader.setBounds (rHeaders.removeFromLeft (cx * 8));
-        common.setBounds (rControls.removeFromLeft (cx * 8));
-
-        unisonHeader.setBounds (rHeaders.removeFromLeft (cx * 4));
-        unison.setBounds (rControls.removeFromLeft (cx * 4));
-    }
-
     // Oscillators
     {
         auto rHeaders = rc.removeFromTop (hh);
         for (auto& c : oscHeaders)
             c.setBounds (rHeaders.removeFromLeft (cx * 3));
 
+        unisonHeader.setBounds (rHeaders.removeFromLeft (cx * 2));
+
         auto rOscs = rc.removeFromTop (cy * 2);
         for (auto& c : oscillators)
             c.setBounds (rOscs.removeFromLeft (cx * 3));
+
+        unison.setBounds (rOscs.removeFromLeft (cx * 2));
     }
 
     // Filters
     {
         auto rHeaders = rc.removeFromTop (hh);
         for (auto& c : filterHeaders)
-            c.setBounds (rHeaders.removeFromLeft (cx * 6));
+            c.setBounds (rHeaders.removeFromLeft (cx * 7));
 
         auto rFilters = rc.removeFromTop (cy * 2);
         for (auto& c : filters)
-            c.setBounds (rFilters.removeFromLeft (cx * 6));
+            c.setBounds (rFilters.removeFromLeft (cx * 7));
     }
 
     // ADSR and mod
     {
         auto rHeaders = rc.removeFromTop (hh);
-        adsrHeader.setBounds (rHeaders.removeFromLeft (cx * 3));
+        adsrHeader.setBounds (rHeaders.removeFromLeft (cx * 5));
         modulationHeader.setBounds (rHeaders.removeFromLeft (cx * 9));
 
         auto rFilters = rc.removeFromTop (cy * 2);
-        adsr.setBounds (rFilters.removeFromLeft (cx * 3));
+        adsr.setBounds (rFilters.removeFromLeft (cx * 5));
         modulation.setBounds (rFilters.removeFromLeft (cx * 9));
     }
 
-    // Effects
+    // Effects & Common
     {
         auto rHeaders = rc.removeFromTop (hh);
-        effectsHeader.setBounds (rHeaders.removeFromLeft (cx * 12));
+        effectsHeader.setBounds (rHeaders.removeFromLeft (cx * 10));
+        commonHeader.setBounds (rHeaders.removeFromLeft (cx * 4));
 
-        auto rFilters = rc.removeFromTop (cy * 1);
-        effects.setBounds (rFilters.removeFromLeft (cx * 12));
+        auto rControls = rc.removeFromTop (cy * 2);
+        effects.setBounds (rControls.removeFromLeft (cx * 10));
+        common.setBounds (rControls.removeFromLeft (cx * 4));
     }
 }

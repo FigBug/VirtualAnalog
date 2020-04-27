@@ -121,7 +121,7 @@ public:
     {
         DistortionParams() = default;
 
-        gin::Parameter::Ptr enable, amount;
+        gin::Parameter::Ptr enable, amount, highpass, output, mix;
 
         void setup (VirtualAnalogAudioProcessor& p);
 
@@ -217,11 +217,13 @@ public:
 
     //==============================================================================
     gin::Modulation chorus { 0.5f };
+    gin::Distortion distortion;
     gin::StereoDelay stereoDelay { 120.1 };
     gin::Dynamics compressor;
     gin::Dynamics limiter;
     gin::EQ eq {4};
     Reverb reverb;
+    gin::GainProcessor outputGain;
 
     //==============================================================================
     gin::ModMatrix modMatrix;

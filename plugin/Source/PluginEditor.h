@@ -21,8 +21,8 @@ private:
     gin::ControlHeader commonHeader { "Common" };
     gin::ControlHeader unisonHeader { "Unison" };
 
-    CommonBox common {proc};
-    UnisonBox unison {proc};
+    CommonBox common { *this, proc };
+    UnisonBox unison { *this, proc };
 
     gin::ControlHeader oscHeaders[4] =
     {
@@ -33,10 +33,10 @@ private:
     };
     OscillatorBox oscillators[4] =
     {
-        { proc, 0 },
-        { proc, 1 },
-        { proc, 2 },
-        { proc, 3 },
+        { *this, proc, 0 },
+        { *this, proc, 1 },
+        { *this, proc, 2 },
+        { *this, proc, 3 },
     };
 
     gin::ControlHeader filterHeaders[2] =
@@ -46,18 +46,18 @@ private:
     };
     FilterBox filters[2] =
     {
-        { proc, 0 },
-        { proc, 1 },
+        { *this, proc, 0 },
+        { *this, proc, 1 },
     };
 
     gin::ControlHeader adsrHeader { "ADSR" };
-    ADSRBox adsr { proc };
+    ADSRBox adsr { *this, proc };
 
     gin::ControlHeader modulationHeader { "Modulation" };
-    ModulationBox modulation { proc };
+    ModulationBox modulation { *this, proc };
 
     gin::ControlHeader effectsHeader { "Effects" };
-    EffectsBox effects { proc };
+    EffectsBox effects { *this, proc };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessorEditor)
 };

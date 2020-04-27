@@ -7,17 +7,26 @@
 class CommonBox : public gin::ControlBox
 {
 public:
-    CommonBox (VirtualAnalogAudioProcessor& proc)
+    CommonBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+        : gin::ControlBox (e)
     {
-        ignoreUnused (proc);
+        add (level = new gin::Knob (proc.globalParams.level, true));
     }
+
+    void resized() override
+    {
+        level->setBounds (getGridArea (0, 0));
+    }
+
+    ParamComponentPtr level;
 };
 
 //==============================================================================
 class UnisonBox : public gin::ControlBox
 {
 public:
-    UnisonBox (VirtualAnalogAudioProcessor& proc)
+    UnisonBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+        : gin::ControlBox (e)
     {
         for (int i = 0; i < 4; i++)
         {
@@ -35,8 +44,8 @@ public:
         for (int i = 0; i < 4; i++)
         {
             voices[i]->setBounds (getGridArea (1, 0));
-            detune[i]->setBounds (getGridArea (2, 0));
-            spread[i]->setBounds (getGridArea (3, 0));
+            detune[i]->setBounds (getGridArea (0, 1));
+            spread[i]->setBounds (getGridArea (1, 1));
         }
     }
 
@@ -57,7 +66,8 @@ public:
 class OscillatorBox : public gin::ControlBox
 {
 public:
-    OscillatorBox (VirtualAnalogAudioProcessor& proc, int idx)
+    OscillatorBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc, int idx)
+        : gin::ControlBox (e)
     {
         auto& osc = proc.oscParams[idx];
 
@@ -86,7 +96,8 @@ public:
 class FilterBox : public gin::ControlBox
 {
 public:
-    FilterBox (VirtualAnalogAudioProcessor& proc, int idx)
+    FilterBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc, int idx)
+        : gin::ControlBox (e)
     {
         auto& flt = proc.filterParams[idx];
 
@@ -127,7 +138,8 @@ public:
 class ADSRBox : public gin::ControlBox
 {
 public:
-    ADSRBox (VirtualAnalogAudioProcessor& proc)
+    ADSRBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+        : gin::ControlBox (e)
     {
         auto& adsr = proc.adsrParams;
 
@@ -156,7 +168,8 @@ public:
 class ModulationBox : public gin::ControlBox
 {
 public:
-    ModulationBox (VirtualAnalogAudioProcessor& proc)
+    ModulationBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+        : gin::ControlBox (e)
     {
         int cnt = 0;
         for (int i = 0; i < numElementsInArray (proc.lfoParams); i++, cnt++)
@@ -164,10 +177,10 @@ public:
             auto& env = proc.lfoParams[i];
             auto& pg  = lfos[i];
 
-            add (cnt, pg.wave         = new gin::Switch (env.wave));
-            add (cnt, pg.rate         = new gin::Select (env.rate));
+            add (cnt, pg.sync         = new gin::Switch (env.sync));
+            add (cnt, pg.wave         = new gin::Select (env.wave));
+            add (cnt, pg.rate         = new gin::Knob (env.rate));
             add (cnt, pg.beat         = new gin::Knob (env.beat));
-            add (cnt, pg.sync         = new gin::Knob (env.sync));
 
             add (cnt, pg.depth        = new gin::Knob (env.depth));
             add (cnt, pg.phase        = new gin::Knob (env.phase));
@@ -230,11 +243,81 @@ private:
 };
 
 //==============================================================================
-class EffectsBox : public gin::ControlBox
+class EffectsBox : public gin::PagedControlBox
 {
 public:
-    EffectsBox (VirtualAnalogAudioProcessor& proc)
+    EffectsBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+        : gin::PagedControlBox (e)
     {
-        ignoreUnused (proc);
+        int idx = 0;
+
+        addPage ("Chorus", 3, 2);
+        addPageEnable (idx, proc.chorusParams.enable);
+        addControl (idx, new gin::Knob (proc.chorusParams.delay), 0, 0);
+        addControl (idx, new gin::Knob (proc.chorusParams.rate), 1, 0);
+        addControl (idx, new gin::Knob (proc.chorusParams.depth), 2, 0);
+        addControl (idx, new gin::Knob (proc.chorusParams.width), 0, 1);
+        addControl (idx, new gin::Knob (proc.chorusParams.mix), 1, 1);
+        idx++;
+
+        addPage ("Distortion", 2, 2);
+        addPageEnable (idx, proc.distortionParams.enable);
+        addControl (idx, new gin::Knob (proc.distortionParams.amount), 0, 0);
+        addControl (idx, new gin::Knob (proc.distortionParams.highpass), 1, 0);
+        addControl (idx, new gin::Knob (proc.distortionParams.output), 0, 1);
+        addControl (idx, new gin::Knob (proc.distortionParams.mix), 1, 1);
+        idx++;
+
+        addPage ("EQ", 6, 2);
+        addPageEnable (idx, proc.eqParams.enable);
+        addControl (idx, new gin::Knob (proc.eqParams.loFreq), 0, 0);
+        addControl (idx, new gin::Knob (proc.eqParams.loGain), 1, 0);
+        addControl (idx, new gin::Knob (proc.eqParams.loQ), 2, 0);
+        addControl (idx, new gin::Knob (proc.eqParams.mid1Freq), 3, 0);
+        addControl (idx, new gin::Knob (proc.eqParams.mid1Gain), 4, 0);
+        addControl (idx, new gin::Knob (proc.eqParams.mid1Q), 5, 0);
+        addControl (idx, new gin::Knob (proc.eqParams.mid2Freq), 0, 1);
+        addControl (idx, new gin::Knob (proc.eqParams.mid2Gain), 1, 1);
+        addControl (idx, new gin::Knob (proc.eqParams.mid2Q), 2, 1);
+        addControl (idx, new gin::Knob (proc.eqParams.hiFreq), 3, 1);
+        addControl (idx, new gin::Knob (proc.eqParams.hiGain), 4, 1);
+        addControl (idx, new gin::Knob (proc.eqParams.hiQ), 5, 1);
+        idx++;
+
+        addPage ("Comp", 3, 2);
+        addPageEnable (idx, proc.compressorParams.enable);
+        addControl (idx, new gin::Knob (proc.compressorParams.attack), 0, 0);
+        addControl (idx, new gin::Knob (proc.compressorParams.release), 1, 0);
+        addControl (idx, new gin::Knob (proc.compressorParams.ratio), 2, 0);
+        addControl (idx, new gin::Knob (proc.compressorParams.threshold), 0, 1);
+        addControl (idx, new gin::Knob (proc.compressorParams.gain), 1, 1);
+        idx++;
+
+        addPage ("Delay", 3, 2);
+        addPageEnable (idx, proc.delayParams.enable);
+        addControl (idx, new gin::Knob (proc.delayParams.sync), 0, 0);
+        addControl (idx, new gin::Knob (proc.delayParams.time), 1, 0);
+        addControl (idx, new gin::Knob (proc.delayParams.beat), 2, 0);
+        addControl (idx, new gin::Knob (proc.delayParams.fb), 0, 1);
+        addControl (idx, new gin::Knob (proc.delayParams.cf), 1, 1);
+        addControl (idx, new gin::Knob (proc.delayParams.mix), 2, 1);
+        idx++;
+
+        addPage ("Reverb", 3, 2);
+        addPageEnable (idx, proc.reverbParams.enable);
+        addControl (idx, new gin::Knob (proc.reverbParams.damping), 0, 0);
+        addControl (idx, new gin::Knob (proc.reverbParams.freezeMode), 1, 0);
+        addControl (idx, new gin::Knob (proc.reverbParams.roomSize), 2, 0);
+        addControl (idx, new gin::Knob (proc.reverbParams.width), 0, 1);
+        addControl (idx, new gin::Knob (proc.reverbParams.mix), 1, 1);
+        idx++;
+
+        addPage ("Limiter", 2, 2);
+        addPageEnable (idx, proc.limiterParams.enable);
+        addControl (idx, new gin::Knob (proc.limiterParams.attack), 0, 0);
+        addControl (idx, new gin::Knob (proc.limiterParams.release), 1, 0);
+        addControl (idx, new gin::Knob (proc.limiterParams.threshold), 0, 1);
+        addControl (idx, new gin::Knob (proc.limiterParams.gain), 1, 1);
+        idx++;
     }
 };
