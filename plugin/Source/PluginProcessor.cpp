@@ -478,6 +478,21 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
                       modMatrix.getValue (eqParams.loFreq),
                       modMatrix.getValue (eqParams.loQ),
                       modMatrix.getValue (eqParams.loGain));
+        
+        eq.setParams (1, EQ::peak,
+                      modMatrix.getValue (eqParams.mid1Freq),
+                      modMatrix.getValue (eqParams.mid1Q),
+                      modMatrix.getValue (eqParams.mid1Gain));
+
+        eq.setParams (2, EQ::peak,
+                      modMatrix.getValue (eqParams.mid2Freq),
+                      modMatrix.getValue (eqParams.mid2Q),
+                      modMatrix.getValue (eqParams.mid2Gain));
+
+        eq.setParams (3, EQ::highshelf,
+                      modMatrix.getValue (eqParams.hiFreq),
+                      modMatrix.getValue (eqParams.hiQ),
+                      modMatrix.getValue (eqParams.hiGain));
     }
 
     // Update Compressor
