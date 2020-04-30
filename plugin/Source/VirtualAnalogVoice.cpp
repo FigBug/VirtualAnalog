@@ -103,8 +103,9 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     buffer.applyGain (velocityToGain (currentlyPlayingNote.noteOnVelocity.asUnsignedFloat()));
 
     // Apply filters
-    for (auto& f : filters)
-        f.process (buffer);
+    for (int i = 0; i < numElementsInArray (filters); i++)
+        if (proc.filterParams[i].enable->isOn())
+            filters[i].process (buffer);
     
     // Run ADSR
     adsr.processMultiplying (buffer);
@@ -159,8 +160,42 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
         float q = Q / (1.0f - (getValue (proc.filterParams[i].resonance) / 100.0f) * 0.99f);
 
-        filters[i].setType((Filter::Type)int (proc.filterParams[i].type->getProcValue()));
-        filters[i].setSlope ((Filter::Slope)int (proc.filterParams[i].slope->getProcValue()));
+        switch (int (proc.filterParams[i].type->getProcValue()))
+        {
+            case 0:
+                filters[i].setType (Filter::lowpass);
+                filters[i].setSlope (Filter::db12);
+                break;
+            case 1:
+                filters[i].setType (Filter::lowpass);
+                filters[i].setSlope (Filter::db24);
+                break;
+            case 2:
+                filters[i].setType (Filter::highpass);
+                filters[i].setSlope (Filter::db12);
+                break;
+            case 3:
+                filters[i].setType (Filter::highpass);
+                filters[i].setSlope (Filter::db24);
+                break;
+            case 4:
+                filters[i].setType (Filter::bandpass);
+                filters[i].setSlope (Filter::db12);
+                break;
+            case 5:
+                filters[i].setType (Filter::bandpass);
+                filters[i].setSlope (Filter::db24);
+                break;
+            case 6:
+                filters[i].setType (Filter::notch);
+                filters[i].setSlope (Filter::db12);
+                break;
+            case 7:
+                filters[i].setType (Filter::notch);
+                filters[i].setSlope (Filter::db24);
+                break;
+        }
+        
         filters[i].setParams (f, q);
 
         proc.modMatrix.setPolyValue (*this, proc.modSrcFilter[i], filterADSRs[i].getOutput());

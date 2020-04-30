@@ -12,8 +12,8 @@ VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAna
     gin::addAndMakeVisible (*this, { &oscHeaders[0], &oscHeaders[1], &oscHeaders[2], &oscHeaders[3] });
     gin::addAndMakeVisible (*this, { &oscillators[0], &oscillators[1], &oscillators[2], &oscillators[3] });
 
-    gin::addAndMakeVisible (*this, { &filterHeaders[0], &filterHeaders[1] });
-    gin::addAndMakeVisible (*this, { &filters[0], &filters[1] });
+    gin::addAndMakeVisible (*this, { &filterHeaders });
+    gin::addAndMakeVisible (*this, { &filters });
 
     gin::addAndMakeVisible (*this, { &adsrHeader, &adsr });
     gin::addAndMakeVisible (*this, { &modulationHeader, &modulation });
@@ -66,12 +66,10 @@ void VirtualAnalogAudioProcessorEditor::resized()
     // Filters
     {
         auto rHeaders = rc.removeFromTop (hh);
-        for (auto& c : filterHeaders)
-            c.setBounds (rHeaders.removeFromLeft (cx * 7));
+        filterHeaders.setBounds (rHeaders.removeFromLeft (cx * 14));
 
         auto rFilters = rc.removeFromTop (cy * 2);
-        for (auto& c : filters)
-            c.setBounds (rFilters.removeFromLeft (cx * 7));
+        filters.setBounds (rFilters.removeFromLeft (cx * 14));
     }
 
     // ADSR and mod

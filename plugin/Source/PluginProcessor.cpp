@@ -16,23 +16,68 @@ static String waveTextFunction (const Parameter&, float v)
         case Wave::pulse:       return "Pulse";
         case Wave::square:      return "Square";
         case Wave::noise:       return "Noise";
+        default:
+            jassertfalse;
+            return {};
     }
 }
 
-String enableTextFunction (const Parameter&, float v)
+static String lfoTextFunction (const Parameter&, float v)
+{
+    switch ((LFO::WaveShape)int (v))
+    {
+        case LFO::WaveShape::none: return "None";
+        case LFO::WaveShape::sine: return "Sine";
+        case LFO::WaveShape::triangle: return "Triangle";
+        case LFO::WaveShape::sawUp: return "Saw Up";
+        case LFO::WaveShape::sawDown: return "Saw Down";
+        case LFO::WaveShape::square: return "Square";
+        case LFO::WaveShape::squarePos: return "Square+";
+        case LFO::WaveShape::sampleAndHold: return "S&H";
+        case LFO::WaveShape::noise: return "Noise";
+        case LFO::WaveShape::stepUp4: return "Step Up 4";
+        case LFO::WaveShape::stepup8: return "Step Up 8";
+        case LFO::WaveShape::stepDown4: return "Step Down 4";
+        case LFO::WaveShape::stepDown8: return "Step Down 8";
+        default:
+            jassertfalse;
+            return {};
+    }
+}
+
+static String enableTextFunction (const Parameter&, float v)
 {
     return v > 0.0f ? "On" : "Off";
 }
 
-String durationTextFunction (const Parameter&, float v)
+static String durationTextFunction (const Parameter&, float v)
 {
     return NoteDuration::getNoteDurations()[size_t (v)].getName();
 }
 
-String distortionAmountTextFunction (const Parameter&, float v)
+static String distortionAmountTextFunction (const Parameter&, float v)
 {
     return String (v * 5.0f - 1.0f, 1);
 }
+
+static String filterTextFunction (const Parameter&, float v)
+{
+    switch (int (v))
+    {
+        case 0: return "LP 12";
+        case 1: return "LP 24";
+        case 2: return "HP 12";
+        case 3: return "HP 24";
+        case 4: return "BP 12";
+        case 5: return "BP 24";
+        case 6: return "NT 12";
+        case 7: return "NT 24";
+        default:
+            jassertfalse;
+            return {};
+    }
+}
+
 
 //==============================================================================
 void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor& p, int idx)
@@ -59,11 +104,11 @@ void VirtualAnalogAudioProcessor::FilterParams::setup (VirtualAnalogAudioProcess
 
     float maxFreq = float (getMidiNoteFromHertz (20000.0));
 
-    type             = p.addIntParam (id + "type",    nm + "Type",    "Type",  "", { 0.0, 4.0, 1.0, 1.0 }, 0.0, {});
-    slope            = p.addIntParam (id + "slope",   nm + "Slope",   "Slope", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "",      "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1 : 0, {});
+    type             = p.addIntParam (id + "type",    nm + "Type",    "Type",  "", { 0.0, 7.0, 1.0, 1.0 }, 0.0, {}, filterTextFunction);
     keyTracking      = p.addExtParam (id + "key",     nm + "Key",     "Key",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
     velocityTracking = p.addExtParam (id + "vel",     nm + "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
-    frequency        = p.addExtParam (id + "freq",    nm + "Freq",    "Freq",  "", { 0.0, maxFreq, 0.0, 1.0 }, 0.0, {});
+    frequency        = p.addExtParam (id + "freq",    nm + "Freq",    "Freq",  "", { 0.0, maxFreq, 0.0, 1.0 }, 64.0, {});
     resonance        = p.addExtParam (id + "res",     nm + "Res",     "Res",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
     amount           = p.addExtParam (id + "amount",  nm + "Amount",  "Amnt",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
     attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
@@ -96,8 +141,8 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
     
     auto notes = NoteDuration::getNoteDurations();
 
-    sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
-    wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 12.0, 1.0, 1.0 }, 0.0, {});
+    sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {}, enableTextFunction);
+    wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 12.0, 1.0, 1.0 }, 0.0, {}, lfoTextFunction);
     rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "", { 0.0, 500.0, 0.0, 0.3f }, 10.0, {});
     beat             = p.addExtParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, {});
     depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { 0.0, 1.0, 0.0, 1.0 }, 1.0, {});
@@ -138,7 +183,7 @@ void VirtualAnalogAudioProcessor::ChorusParams::setup (VirtualAnalogAudioProcess
     depth  = p.addExtParam ("chDepth",     "Depth",   "",   "ms", {0.1f, 20.0f, 0.0f, 1.0f}, 1.0f, {});
     rate   = p.addExtParam ("chSpeed",     "Speed",   "",   "Hz", {0.1f, 10.0f, 0.0f, 1.0f}, 3.0f, {});
     width  = p.addExtParam ("chWidth",     "Width",   "",   "",   {0.0f, 1.0f,  0.0f, 1.0f}, 0.5f, {});
-    mix    = p.addExtParam ("chMix",       "Mix",     "",   "",   {0.0f, 1.0f,  0.0f, 1.0f}, 0.0f, {});
+    mix    = p.addExtParam ("chMix",       "Mix",     "",   "",   {0.0f, 1.0f,  0.0f, 1.0f}, 0.5f, {});
 
     delay->conversionFunction = [] (float in) { return in / 1000.0f; };
     depth->conversionFunction = [] (float in) { return in / 1000.0f; };
@@ -220,7 +265,7 @@ void VirtualAnalogAudioProcessor::DelayParams::setup (VirtualAnalogAudioProcesso
     beat  = p.addExtParam ("dlBeat",  "Delay",     "", "",   {   0.0f,    mxd, 1.0f, 1.0f},   13.0f, 0.0f, durationTextFunction);
     fb    = p.addExtParam ("dlFb",    "Feedback",  "", "dB", {-100.0f,   0.0f, 0.0f, 5.0f},  -10.0f, 0.1f);
     cf    = p.addExtParam ("dlCf",    "Crossfeed", "", "dB", {-100.0f,   0.0f, 0.0f, 5.0f}, -100.0f, 0.1f);
-    mix   = p.addExtParam ("dlMix",   "Mix",       "", "%",  {   0.0f, 100.0f, 0.0f, 1.0f},    0.0f, 0.1f);
+    mix   = p.addExtParam ("dlMix",   "Mix",       "", "%",  {   0.0f, 100.0f, 0.0f, 1.0f},    0.5f, 0.1f);
 
     delay = p.addIntParam ("dlDelay", "Delay",     "", "",   {   0.0f, 120.0f, 0.0f, 1.0f},    1.0f, {0.2f, SmoothingType::eased});
 

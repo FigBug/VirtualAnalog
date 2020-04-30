@@ -93,45 +93,33 @@ public:
 };
 
 //==============================================================================
-class FilterBox : public gin::ControlBox
+class FilterBox : public gin::PagedControlBox
 {
 public:
-    FilterBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc, int idx)
-        : gin::ControlBox (e)
+    FilterBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+        : gin::PagedControlBox (e)
     {
-        auto& flt = proc.filterParams[idx];
+        for (int i = 0; i < numElementsInArray (proc.filterParams); i++)
+        {
+            auto& flt = proc.filterParams[i];
+            
+            addPage ("Filter " + String (i + 1), 8, 2);
+            addPageEnable (i, flt.enable);
 
-        add (type             = new gin::Select (flt.type));
-        add (frequency        = new gin::Knob (flt.frequency));
-        add (resonance        = new gin::Knob (flt.resonance));
+            addControl (i, new gin::Select (flt.type), 0, 0);
+            addControl (i, new gin::Knob (flt.frequency), 1, 0);
+            addControl (i, new gin::Knob (flt.resonance), 2, 0);
 
-        add (keyTracking      = new gin::Knob (flt.keyTracking));
-        add (velocityTracking = new gin::Knob (flt.velocityTracking));
-        add (amount           = new gin::Knob (flt.amount));
+            addControl (i, new gin::Knob (flt.keyTracking), 0, 1);
+            addControl (i, new gin::Knob (flt.velocityTracking), 1, 1);
+            addControl (i, new gin::Knob (flt.amount), 2, 1);
 
-        add (attack           = new gin::Knob (flt.attack));
-        add (decay            = new gin::Knob (flt.decay));
-        add (sustain          = new gin::Knob (flt.sustain));
-        add (release          = new gin::Knob (flt.release));
+            addControl (i, new gin::Knob (flt.attack), 6, 0);
+            addControl (i, new gin::Knob (flt.decay), 7, 0);
+            addControl (i, new gin::Knob (flt.sustain), 6, 1);
+            addControl (i, new gin::Knob (flt.release), 7, 1);
+        }
     }
-
-    void resized() override
-    {
-        type->setBounds (getGridArea (0, 0));
-        frequency->setBounds (getGridArea (1, 0));
-        resonance->setBounds (getGridArea (2, 0));
-        keyTracking->setBounds (getGridArea (0, 1));
-        velocityTracking->setBounds (getGridArea (1, 1));
-        amount->setBounds (getGridArea (2, 1));
-
-        attack->setBounds (getGridArea (4, 0));
-        decay->setBounds (getGridArea (5, 0));
-        sustain->setBounds (getGridArea (4, 1));
-        release->setBounds (getGridArea (5, 1));
-    }
-
-    ParamComponentPtr type, keyTracking, velocityTracking, frequency,
-                      resonance, amount, attack, decay, sustain, release;
 };
 
 //==============================================================================

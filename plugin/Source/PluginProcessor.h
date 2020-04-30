@@ -52,7 +52,7 @@ public:
     {
         FilterParams() = default;
 
-        gin::Parameter::Ptr type, slope, keyTracking, velocityTracking,
+        gin::Parameter::Ptr enable, type, keyTracking, velocityTracking,
                             frequency, resonance, amount,
                             attack, decay, sustain, release;
 

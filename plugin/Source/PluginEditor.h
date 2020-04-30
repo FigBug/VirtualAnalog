@@ -39,17 +39,9 @@ private:
         { *this, proc, 3 },
     };
 
-    gin::ControlHeader filterHeaders[2] =
-    {
-        { "Filter 1" },
-        { "Filter 2" },
-    };
-    FilterBox filters[2] =
-    {
-        { *this, proc, 0 },
-        { *this, proc, 1 },
-    };
-
+    gin::ControlHeader filterHeaders { "Filters" };
+    
+    FilterBox filters { *this, proc };
     gin::ControlHeader adsrHeader { "ADSR" };
     ADSRBox adsr { *this, proc };
 
