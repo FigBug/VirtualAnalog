@@ -10,7 +10,7 @@ public:
     CommonBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
         : gin::ControlBox (e)
     {
-        add (level = new gin::Knob (proc.globalParams.level, true));
+        add (level = new gin::Knob (proc.globalParams.level));
     }
 
     void resized() override
@@ -129,81 +129,43 @@ public:
 };
 
 //==============================================================================
-class ModulationBox : public gin::ControlBox
+class ModulationBox : public gin::PagedControlBox
 {
 public:
     ModulationBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
-        : gin::ControlBox (e)
+        : gin::PagedControlBox (e)
     {
         int cnt = 0;
         for (int i = 0; i < numElementsInArray (proc.lfoParams); i++, cnt++)
         {
             auto& env = proc.lfoParams[i];
-            auto& pg  = lfos[i];
 
-            add (cnt, pg.sync         = new gin::Switch (env.sync));
-            add (cnt, pg.wave         = new gin::Select (env.wave));
-            add (cnt, pg.rate         = new gin::Knob (env.rate));
-            add (cnt, pg.beat         = new gin::Knob (env.beat));
+            addPage (i == 0 ? "LFO1" : "LFO2", 5, 2);
 
-            add (cnt, pg.depth        = new gin::Knob (env.depth));
-            add (cnt, pg.phase        = new gin::Knob (env.phase));
-            add (cnt, pg.offset       = new gin::Knob (env.offset));
-            add (cnt, pg.fade         = new gin::Knob (env.fade));
-            add (cnt, pg.delay        = new gin::Knob (env.delay));
+            addControl (cnt, new gin::Switch (env.sync), 0, 0);
+            addControl (cnt, new gin::Select (env.wave), 1, 0);
+            addControl (cnt, new gin::Knob (env.rate), 2, 0);
+            addControl (cnt, new gin::Knob (env.beat), 3, 0);
+
+            addControl (cnt, new gin::Knob (env.depth), 0, 1);
+            addControl (cnt, new gin::Knob (env.phase), 1, 1);
+            addControl (cnt, new gin::Knob (env.offset), 2, 1);
+            addControl (cnt, new gin::Knob (env.fade), 3, 1);
+            addControl (cnt, new gin::Knob (env.delay), 4, 1);
         }
 
         for (int i = 0; i < numElementsInArray (proc.envParams); i++, cnt++)
         {
             auto& env = proc.envParams[i];
-            auto& pg  = envs[i];
 
-            add (cnt, pg.attack        = new gin::Knob (env.attack));
-            add (cnt, pg.decay         = new gin::Knob (env.decay));
-            add (cnt, pg.sustain       = new gin::Knob (env.sustain));
-            add (cnt, pg.release       = new gin::Knob (env.release));
-        }
+            addPage (i == 0 ? "ENV1" : "ENV2", 2, 2);
 
-        setPage (0);
-    }
-
-private:
-    void resized() override
-    {
-        for (auto& l : lfos)
-        {
-            l.sync->setBounds (getGridArea (0, 0));
-            l.wave->setBounds (getGridArea (1, 0));
-            l.rate->setBounds (getGridArea (2, 0));
-            l.beat->setBounds (getGridArea (3, 0));
-            l.depth->setBounds (getGridArea (4, 0));
-            l.phase->setBounds (getGridArea (1, 1));
-            l.offset->setBounds (getGridArea (2, 1));
-            l.fade->setBounds (getGridArea (3, 1));
-            l.delay->setBounds (getGridArea (4, 1));
-        }
-
-        for (auto& e : envs)
-        {
-            e.attack->setBounds (getGridArea (0, 0));
-            e.decay->setBounds (getGridArea (1, 0));
-            e.sustain->setBounds (getGridArea (0, 1));
-            e.release->setBounds (getGridArea (1, 1));
+            addControl (cnt, new gin::Knob (env.attack), 0, 0);
+            addControl (cnt, new gin::Knob (env.decay), 1, 0);
+            addControl (cnt, new gin::Knob (env.sustain), 0, 1);
+            addControl (cnt, new gin::Knob (env.release), 1, 1);
         }
     }
-
-    struct LFO
-    {
-        ParamComponentPtr sync, wave, rate, beat, depth, phase, offset, fade, delay;
-    };
-
-    struct ENV
-    {
-        ParamComponentPtr attack, decay, sustain, release;
-    };
-
-    LFO lfos[2];
-    ENV envs[2];
 };
 
 //==============================================================================
