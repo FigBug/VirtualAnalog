@@ -25,19 +25,19 @@ static String lfoTextFunction (const Parameter&, float v)
 {
     switch ((LFO::WaveShape)int (v))
     {
-        case LFO::WaveShape::none: return "None";
-        case LFO::WaveShape::sine: return "Sine";
-        case LFO::WaveShape::triangle: return "Triangle";
-        case LFO::WaveShape::sawUp: return "Saw Up";
-        case LFO::WaveShape::sawDown: return "Saw Down";
-        case LFO::WaveShape::square: return "Square";
-        case LFO::WaveShape::squarePos: return "Square+";
+        case LFO::WaveShape::none:          return "None";
+        case LFO::WaveShape::sine:          return "Sine";
+        case LFO::WaveShape::triangle:      return "Triangle";
+        case LFO::WaveShape::sawUp:         return "Saw Up";
+        case LFO::WaveShape::sawDown:       return "Saw Down";
+        case LFO::WaveShape::square:        return "Square";
+        case LFO::WaveShape::squarePos:     return "Square+";
         case LFO::WaveShape::sampleAndHold: return "S&H";
-        case LFO::WaveShape::noise: return "Noise";
-        case LFO::WaveShape::stepUp4: return "Step Up 4";
-        case LFO::WaveShape::stepup8: return "Step Up 8";
-        case LFO::WaveShape::stepDown4: return "Step Down 4";
-        case LFO::WaveShape::stepDown8: return "Step Down 8";
+        case LFO::WaveShape::noise:         return "Noise";
+        case LFO::WaveShape::stepUp4:       return "Step Up 4";
+        case LFO::WaveShape::stepup8:       return "Step Up 8";
+        case LFO::WaveShape::stepDown4:     return "Step Down 4";
+        case LFO::WaveShape::stepDown8:     return "Step Down 8";
         default:
             jassertfalse;
             return {};
@@ -144,7 +144,7 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
     sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {}, enableTextFunction);
     wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 12.0, 1.0, 1.0 }, 0.0, {}, lfoTextFunction);
     rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "", { 0.0, 500.0, 0.0, 0.3f }, 10.0, {});
-    beat             = p.addExtParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, {});
+    beat             = p.addExtParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, {}, durationTextFunction);
     depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { 0.0, 1.0, 0.0, 1.0 }, 1.0, {});
     phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { 0.0, 1.0, 0.0, 1.0 }, 0.0, {});
     offset           = p.addExtParam (id + "offset",  nm + "Offset",  "Offset", "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});

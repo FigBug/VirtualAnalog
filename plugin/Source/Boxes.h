@@ -25,8 +25,8 @@ public:
 class OscillatorBox : public gin::PagedControlBox
 {
 public:
-    OscillatorBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
-        : gin::PagedControlBox (e)
+    OscillatorBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+        : gin::PagedControlBox (e), proc (proc_)
     {
         for ( int i = 0; i < numElementsInArray (proc.oscParams); i++)
         {
@@ -40,7 +40,9 @@ public:
             addControl (i, new gin::Knob (osc.finetune, true), 2, 0);
             addControl (i, new gin::Knob (osc.pan, true), 0, 1);
             addControl (i, new gin::Knob (osc.level), 1, 1);
-            addControl (i, new gin::Knob (osc.pulsewidth), 2, 1);
+            addControl (i, pw[i] = new gin::Knob (osc.pulsewidth), 2, 1);
+
+            watchParam (osc.wave);
         }
         
         addPage ("Unison", 2, 2);
@@ -54,6 +56,17 @@ public:
         }
         setOSC (0);
     }
+
+    void paramChanged () override
+    {
+        gin::PagedControlBox::paramChanged ();
+
+        for ( int i = 0; i < numElementsInArray (proc.oscParams); i++)
+        {
+            auto& osc = proc.oscParams[i];
+            pw[i]->setEnabled ((gin::Wave) int (osc.wave->getProcValue()) == gin::Wave::pulse);
+        }
+    }
     
     void setOSC (int osc)
     {
@@ -64,16 +77,17 @@ public:
             spread[i]->setVisible (osc == i);
         }
     }
-    
-    ParamComponentPtr voices[4], detune[4], spread[4];
+
+    VirtualAnalogAudioProcessor& proc;
+    ParamComponentPtr pw[4], voices[4], detune[4], spread[4];
 };
 
 //==============================================================================
 class FilterBox : public gin::PagedControlBox
 {
 public:
-    FilterBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
-        : gin::PagedControlBox (e)
+    FilterBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+        : gin::PagedControlBox (e), proc (proc_)
     {
         for (int i = 0; i < numElementsInArray (proc.filterParams); i++)
         {
@@ -87,19 +101,41 @@ public:
             addControl (i, new gin::Knob (flt.resonance), 2, 0);
 
             addControl (i, new gin::Knob (flt.keyTracking), 0, 1);
-            addControl (i, new gin::Knob (flt.velocityTracking), 1, 1);
-            addControl (i, new gin::Knob (flt.amount), 2, 1);
+            addControl (i, new gin::Knob (flt.amount), 1, 1);
+            addControl (i, v[i] = new gin::Knob (flt.velocityTracking), 2, 1);
 
-            auto adsr = new gin::ADSRComponent ();
-            adsr->setParams (flt.attack, flt.decay, flt.sustain, flt.release);
-            addControl (i, adsr, 3, 0, 3, 2);
+            adsr[i] = new gin::ADSRComponent ();
+            adsr[i]->setParams (flt.attack, flt.decay, flt.sustain, flt.release);
+            addControl (i, adsr[i], 3, 0, 3, 2);
 
-            addControl (i, new gin::Knob (flt.attack), 6, 0);
-            addControl (i, new gin::Knob (flt.decay), 7, 0);
-            addControl (i, new gin::Knob (flt.sustain), 6, 1);
-            addControl (i, new gin::Knob (flt.release), 7, 1);
+            addControl (i, a[i] = new gin::Knob (flt.attack), 6, 0);
+            addControl (i, d[i] = new gin::Knob (flt.decay), 7, 0);
+            addControl (i, s[i] = new gin::Knob (flt.sustain), 6, 1);
+            addControl (i, r[i] = new gin::Knob (flt.release), 7, 1);
+
+            watchParam (flt.amount);
         }
     }
+
+    void paramChanged () override
+    {
+        gin::PagedControlBox::paramChanged ();
+
+        for ( int i = 0; i < numElementsInArray (proc.filterParams); i++)
+        {
+            auto& flt = proc.filterParams[i];
+            v[i]->setEnabled (flt.amount->getUserValue() != 0.0f);
+            a[i]->setEnabled (flt.amount->getUserValue() != 0.0f);
+            d[i]->setEnabled (flt.amount->getUserValue() != 0.0f);
+            s[i]->setEnabled (flt.amount->getUserValue() != 0.0f);
+            r[i]->setEnabled (flt.amount->getUserValue() != 0.0f);
+            adsr[i]->setEnabled (flt.amount->getUserValue() != 0.0f);
+        }
+    }
+
+    VirtualAnalogAudioProcessor& proc;
+    ParamComponentPtr v[2], a[2], d[2], s[2], r[2];
+    gin::ADSRComponent* adsr[2];
 };
 
 //==============================================================================
@@ -109,14 +145,18 @@ public:
     ADSRBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
         : gin::ControlBox (e)
     {
-        auto& adsr = proc.adsrParams;
+        auto& env = proc.adsrParams;
 
-        add (attack           = new gin::Knob (adsr.attack));
-        add (decay            = new gin::Knob (adsr.decay));
-        add (sustain          = new gin::Knob (adsr.sustain));
-        add (release          = new gin::Knob (adsr.release));
+        add (attack           = new gin::Knob (env.attack));
+        add (decay            = new gin::Knob (env.decay));
+        add (sustain          = new gin::Knob (env.sustain));
+        add (release          = new gin::Knob (env.release));
 
-        add (velocityTracking = new gin::Knob (adsr.velocityTracking));
+        add (velocityTracking = new gin::Knob (env.velocityTracking));
+
+        adsr = new gin::ADSRComponent ();
+        adsr->setParams (env.attack, env.decay, env.sustain, env.release);
+        add (adsr);
     }
 
     void resized() override
@@ -127,57 +167,81 @@ public:
         release->setBounds (getGridArea (1, 1));
 
         velocityTracking->setBounds (getGridArea (2, 0));
+
+        adsr->setBounds (getGridArea (3, 0, 3, 2));
     }
 
     ParamComponentPtr velocityTracking, attack, decay, sustain, release;
+    gin::ADSRComponent* adsr;
 };
 
 //==============================================================================
 class ModulationBox : public gin::PagedControlBox
 {
 public:
-    ModulationBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
-        : gin::PagedControlBox (e)
+    ModulationBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+        : gin::PagedControlBox (e), proc (proc_)
     {
         int cnt = 0;
         for (int i = 0; i < numElementsInArray (proc.lfoParams); i++, cnt++)
         {
             auto& env = proc.lfoParams[i];
 
-            addPage (i == 0 ? "LFO1" : "LFO2", 5, 2);
+            addPage (i == 0 ? "LFO1" : "LFO2", 7, 2);
 
-            addControl (cnt, new gin::Switch (env.sync), 0, 0);
             addControl (cnt, new gin::Select (env.wave), 1, 0);
-            addControl (cnt, new gin::Knob (env.rate), 2, 0);
-            addControl (cnt, new gin::Knob (env.beat), 3, 0);
+            addControl (cnt, new gin::Switch (env.sync), 0, 0);
+            addControl (cnt, r[i] = new gin::Knob (env.rate), 2, 0);
+            addControl (cnt, b[i] = new gin::Select (env.beat), 2, 0);
+            addControl (cnt, new gin::Knob (env.depth), 3, 0);
 
-            addControl (cnt, new gin::Knob (env.depth), 0, 1);
-            addControl (cnt, new gin::Knob (env.phase), 1, 1);
-            addControl (cnt, new gin::Knob (env.offset), 2, 1);
-            addControl (cnt, new gin::Knob (env.fade), 3, 1);
-            addControl (cnt, new gin::Knob (env.delay), 4, 1);
+            addControl (cnt, new gin::Knob (env.phase), 0, 1);
+            addControl (cnt, new gin::Knob (env.offset), 1, 1);
+            addControl (cnt, new gin::Knob (env.fade), 2, 1);
+            addControl (cnt, new gin::Knob (env.delay), 3, 1);
+
+            watchParam (env.sync);
         }
 
         for (int i = 0; i < numElementsInArray (proc.envParams); i++, cnt++)
         {
             auto& env = proc.envParams[i];
 
-            addPage (i == 0 ? "ENV1" : "ENV2", 2, 2);
+            addPage (i == 0 ? "ENV1" : "ENV2", 5, 2);
 
             addControl (cnt, new gin::Knob (env.attack), 0, 0);
             addControl (cnt, new gin::Knob (env.decay), 1, 0);
             addControl (cnt, new gin::Knob (env.sustain), 0, 1);
             addControl (cnt, new gin::Knob (env.release), 1, 1);
+
+            auto adsr = new gin::ADSRComponent ();
+            adsr->setParams (env.attack, env.decay, env.sustain, env.release);
+            addControl (cnt, adsr, 2, 0, 3, 2);
         }
     }
+
+    void paramChanged () override
+    {
+        gin::PagedControlBox::paramChanged ();
+
+        for (int i = 0; i < numElementsInArray (proc.lfoParams); i++)
+        {
+            auto& lfo = proc.lfoParams[i];
+            r[i]->setVisible (! lfo.sync->isOn());
+            b[i]->setVisible (lfo.sync->isOn());
+        }
+    }
+
+    VirtualAnalogAudioProcessor& proc;
+    ParamComponentPtr r[2], b[2];
 };
 
 //==============================================================================
 class EffectsBox : public gin::PagedControlBox
 {
 public:
-    EffectsBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
-        : gin::PagedControlBox (e)
+    EffectsBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+        : gin::PagedControlBox (e), proc (proc_)
     {
         int idx = 0;
 
@@ -225,13 +289,15 @@ public:
 
         addPage ("Delay", 3, 2);
         addPageEnable (idx, proc.delayParams.enable);
-        addControl (idx, new gin::Knob (proc.delayParams.sync), 0, 0);
-        addControl (idx, new gin::Knob (proc.delayParams.time), 1, 0);
-        addControl (idx, new gin::Knob (proc.delayParams.beat), 2, 0);
-        addControl (idx, new gin::Knob (proc.delayParams.fb), 0, 1);
+        addControl (idx, new gin::Switch (proc.delayParams.sync), 0, 0);
+        addControl (idx, t = new gin::Knob (proc.delayParams.time), 1, 0);
+        addControl (idx, b = new gin::Select (proc.delayParams.beat), 1, 0);
+        addControl (idx, new gin::Knob (proc.delayParams.fb), 2, 0);
         addControl (idx, new gin::Knob (proc.delayParams.cf), 1, 1);
         addControl (idx, new gin::Knob (proc.delayParams.mix), 2, 1);
         idx++;
+
+        watchParam (proc.delayParams.sync);
 
         addPage ("Reverb", 3, 2);
         addPageEnable (idx, proc.reverbParams.enable);
@@ -250,4 +316,15 @@ public:
         addControl (idx, new gin::Knob (proc.limiterParams.gain), 1, 1);
         idx++;
     }
+
+    void paramChanged () override
+    {
+        gin::PagedControlBox::paramChanged ();
+
+        t->setVisible (! proc.delayParams.sync->isOn());
+        b->setVisible (proc.delayParams.sync->isOn());
+    }
+
+    VirtualAnalogAudioProcessor& proc;
+    ParamComponentPtr t, b;
 };

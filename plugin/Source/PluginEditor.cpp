@@ -69,12 +69,12 @@ void VirtualAnalogAudioProcessorEditor::resized()
     // ADSR and mod
     {
         auto rHeaders = rc.removeFromTop (hh);
-        adsrHeader.setBounds (rHeaders.removeFromLeft (gx * 5));
-        modulationHeader.setBounds (rHeaders.removeFromLeft (gx * 9));
+        adsrHeader.setBounds (rHeaders.removeFromLeft (gx * 6));
+        modulationHeader.setBounds (rHeaders.removeFromLeft (gx * 8));
 
         auto rFilters = rc.removeFromTop (gy * 2);
-        adsr.setBounds (rFilters.removeFromLeft (gx * 5));
-        modulation.setBounds (rFilters.removeFromLeft (gx * 9));
+        adsr.setBounds (rFilters.removeFromLeft (gx * 6));
+        modulation.setBounds (rFilters.removeFromLeft (gx * 8));
     }
 
     // Effects & Common
