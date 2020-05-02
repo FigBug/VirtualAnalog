@@ -125,6 +125,7 @@ void VirtualAnalogAudioProcessor::EnvParams::setup (VirtualAnalogAudioProcessor&
     String id = "env" + String (idx + 1);
     String nm = "ENV" + String (idx + 1) + " ";
 
+    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, 0.0f, enableTextFunction);
     attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
     decay            = p.addExtParam (id + "decay",   nm + "Decay",   "D",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
     sustain          = p.addExtParam (id + "sustain", nm + "Sustain", "S",     "", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
@@ -141,6 +142,7 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
     
     auto notes = NoteDuration::getNoteDurations();
 
+    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
     sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {}, enableTextFunction);
     wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 12.0, 1.0, 1.0 }, 0.0, {}, lfoTextFunction);
     rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "", { 0.0, 500.0, 0.0, 0.3f }, 10.0, {});
@@ -178,7 +180,7 @@ void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcess
 //==============================================================================
 void VirtualAnalogAudioProcessor::ChorusParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable = p.addIntParam ("chEnable",    "Enable",  "",   "",   { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable = p.addIntParam ("chEnable",    "Enable",  "",   "",   { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
     delay  = p.addExtParam ("chDelay",     "Delay",   "",   "ms", {0.1f, 30.0f, 0.0f, 1.0f}, 1.0f, {});
     depth  = p.addExtParam ("chDepth",     "Depth",   "",   "ms", {0.1f, 20.0f, 0.0f, 1.0f}, 1.0f, {});
     rate   = p.addExtParam ("chSpeed",     "Speed",   "",   "Hz", {0.1f, 10.0f, 0.0f, 1.0f}, 3.0f, {});
@@ -192,7 +194,7 @@ void VirtualAnalogAudioProcessor::ChorusParams::setup (VirtualAnalogAudioProcess
 //==============================================================================
 void VirtualAnalogAudioProcessor::DistortionParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable   = p.addIntParam ("dsEnable",   "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable   = p.addIntParam ("dsEnable",   "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
     amount   = p.addExtParam ("dsAmount",   "Amount",     "",   "", { 0.0, 1.0, 0.0, 1.0 }, 0.2f, {}, distortionAmountTextFunction);
     highpass = p.addExtParam ("dsHighpass", "Highpass",   "",   "", { 0.0, 1.0, 0.0, 1.0 }, 0.0, {});
     output   = p.addExtParam ("dsOutput",   "Output",     "",   "", { 0.0, 1.0, 0.0, 1.0 }, 1.0, {});
@@ -208,7 +210,7 @@ void VirtualAnalogAudioProcessor::EQParams::setup (VirtualAnalogAudioProcessor& 
     float d3 = float (getMidiNoteFromHertz (5000.0));
     float d4 = float (getMidiNoteFromHertz (17000.0));
 
-    enable   = p.addIntParam ("eqEnable",    "Enable",      "",     "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable   = p.addIntParam ("eqEnable",    "Enable",      "",     "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
 
     loFreq   = p.addExtParam ("eqLoFreq",    "Lo Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d1, {});
     loQ      = p.addExtParam ("eqLoQ",       "Lo Q",        "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
@@ -240,7 +242,7 @@ void VirtualAnalogAudioProcessor::EQParams::setup (VirtualAnalogAudioProcessor& 
 //==============================================================================
 void VirtualAnalogAudioProcessor::CompressorParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable    = p.addIntParam ("cpEnable",    "Enable",    "", "",     { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable    = p.addIntParam ("cpEnable",    "Enable",    "", "",     { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
 
     attack    = p.addExtParam ("cpAttack",    "Attack",    "", "ms",   { 1.0f,   200.0f, 0.0f, 0.4f},    1.0f, 0.1f);
     release   = p.addExtParam ("cpRelease",   "Release",   "", "ms",   { 1.0f,  2000.0f, 0.0f, 0.4f},    5.0f, 0.1f);
@@ -256,7 +258,7 @@ void VirtualAnalogAudioProcessor::CompressorParams::setup (VirtualAnalogAudioPro
 //==============================================================================
 void VirtualAnalogAudioProcessor::DelayParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable = p.addIntParam ("rvEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {});
+    enable = p.addIntParam ("rvEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
 
     float mxd = float (NoteDuration::getNoteDurations().size()) - 1.0f;
 
@@ -476,24 +478,33 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
     // Update Mono LFOs
     for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
     {
-        LFO::Parameters params;
+        if (lfoParams[i].enable->isOn())
+        {
+            LFO::Parameters params;
 
-        float freq = 0;
-        if (lfoParams[i].sync->getProcValue() > 0.0f)
-            freq = 1.0f / NoteDuration::getNoteDurations()[size_t (lfoParams[i].beat->getProcValue())].toSeconds (playhead);
+            float freq = 0;
+            if (lfoParams[i].sync->getProcValue() > 0.0f)
+                freq = 1.0f / NoteDuration::getNoteDurations()[size_t (lfoParams[i].beat->getProcValue())].toSeconds (playhead);
+            else
+                freq = modMatrix.getValue (lfoParams[i].rate);
+
+            params.waveShape = (LFO::WaveShape) int (lfoParams[i].wave->getProcValue());
+            params.frequency = freq;
+            params.phase     = modMatrix.getValue (lfoParams[i].phase);
+            params.offset    = modMatrix.getValue (lfoParams[i].offset);
+            params.depth     = modMatrix.getValue (lfoParams[i].depth);
+            params.delay     = 0;
+            params.fade      = 0;
+
+            modLFOs[i].setParameters (params);
+            modLFOs[i].process (newBlockSize);
+
+            modMatrix.setMonoValue (modSrcMonoLFO[i], 0);
+        }
         else
-            freq = modMatrix.getValue (lfoParams[i].rate);
-
-        params.waveShape = (LFO::WaveShape) int (lfoParams[i].wave->getProcValue());
-        params.frequency = freq;
-        params.phase     = modMatrix.getValue (lfoParams[i].phase);
-        params.offset    = modMatrix.getValue (lfoParams[i].offset);
-        params.depth     = modMatrix.getValue (lfoParams[i].depth);
-        params.delay     = 0;
-        params.fade      = 0;
-
-        modLFOs[i].setParameters (params);
-        modLFOs[i].process (newBlockSize);
+        {
+            modMatrix.setMonoValue (modSrcMonoLFO[i], 0);
+        }
     }
 
     // Update Chorus

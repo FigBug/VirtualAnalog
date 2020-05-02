@@ -210,39 +210,52 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
     for (int i = 0; i < numENVs; i++)
     {
-        modADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
-        modADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
-        modADSRs[i].setDecay (getValue (proc.filterParams[i].attack));
-        modADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
-        
-        proc.modMatrix.setPolyValue (*this, proc.modSrcEvn[i], modADSRs[i].getOutput());
+        if (proc.filterParams[i].enable->isOn())
+        {
+            modADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
+            modADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
+            modADSRs[i].setDecay (getValue (proc.filterParams[i].attack));
+            modADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
 
-        modADSRs[i].process (blockSize);
+            proc.modMatrix.setPolyValue (*this, proc.modSrcEvn[i], modADSRs[i].getOutput());
+
+            modADSRs[i].process (blockSize);
+        }
+        else
+        {
+            proc.modMatrix.setPolyValue (*this, proc.modSrcEvn[i], 0.0f);
+        }
     }
     
     for (int i = 0; i < numLFOs; i++)
     {
-        LFO::Parameters params;
-        
-        float freq = 0;
-        if (proc.lfoParams[i].sync->getProcValue() > 0.0f)
-            freq = 1.0f / NoteDuration::getNoteDurations()[size_t (proc.lfoParams[i].beat->getProcValue())].toSeconds (proc.playhead);
-        else
-            freq = getValue (proc.lfoParams[i].rate);
-        
-        params.waveShape = (LFO::WaveShape) int (proc.lfoParams[i].wave->getProcValue());
-        params.frequency = freq;
-        params.phase     = getValue (proc.lfoParams[i].phase);
-        params.offset    = getValue (proc.lfoParams[i].offset);
-        params.depth     = getValue (proc.lfoParams[i].depth);
-        params.delay     = getValue (proc.lfoParams[i].delay);
-        params.fade      = getValue (proc.lfoParams[i].fade);
+        if (proc.lfoParams[i].enable->isOn())
+        {
+            LFO::Parameters params;
 
-        modLFOs[i].setParameters (params);
-        
-        proc.modMatrix.setPolyValue (*this, proc.modSrcLFO[i], modLFOs[i].getOutput());
-        
-        modLFOs[i].process (blockSize);
+            float freq = 0;
+            if (proc.lfoParams[i].sync->getProcValue() > 0.0f)
+                freq = 1.0f / NoteDuration::getNoteDurations()[size_t (proc.lfoParams[i].beat->getProcValue())].toSeconds (proc.playhead);
+            else
+                freq = getValue (proc.lfoParams[i].rate);
+
+            params.waveShape = (LFO::WaveShape) int (proc.lfoParams[i].wave->getProcValue());
+            params.frequency = freq;
+            params.phase     = getValue (proc.lfoParams[i].phase);
+            params.offset    = getValue (proc.lfoParams[i].offset);
+            params.depth     = getValue (proc.lfoParams[i].depth);
+            params.delay     = getValue (proc.lfoParams[i].delay);
+            params.fade      = getValue (proc.lfoParams[i].fade);
+
+            modLFOs[i].setParameters (params);
+            modLFOs[i].process (blockSize);
+
+            proc.modMatrix.setPolyValue (*this, proc.modSrcLFO[i], modLFOs[i].getOutput());
+        }
+        else
+        {
+            proc.modMatrix.setPolyValue (*this, proc.modSrcLFO[i], 0);
+        }
     }
 
     adsr.setAttack (getValue (proc.adsrParams.attack));

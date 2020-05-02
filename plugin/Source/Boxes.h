@@ -188,6 +188,7 @@ public:
             auto& lfo = proc.lfoParams[i];
 
             addPage (i == 0 ? "LFO1" : "LFO2", 5, 2);
+            addPageEnable (cnt, lfo.enable);
 
             addControl (cnt, new gin::Switch (lfo.sync), 0, 0);
             addControl (cnt, new gin::Select (lfo.wave), 1, 0);
@@ -201,7 +202,7 @@ public:
             addControl (cnt, new gin::Knob (lfo.delay), 4, 1);
 
             auto l = new gin::LFOComponent();
-            l->setParams (lfo.wave, lfo.sync, lfo.rate, lfo.beat, lfo.depth, lfo.offset, lfo.phase);
+            l->setParams (lfo.wave, lfo.sync, lfo.rate, lfo.beat, lfo.depth, lfo.offset, lfo.phase, lfo.enable);
             addControl (cnt, l, 3, 0, 2, 1);
 
             watchParam (lfo.sync);
@@ -212,6 +213,7 @@ public:
             auto& env = proc.envParams[i];
 
             addPage (i == 0 ? "ENV1" : "ENV2", 5, 2);
+            addPageEnable (cnt, env.enable);
 
             addControl (cnt, new gin::Knob (env.attack), 0, 0);
             addControl (cnt, new gin::Knob (env.decay), 1, 0);
