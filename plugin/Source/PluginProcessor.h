@@ -40,8 +40,8 @@ public:
     {
         OSCParams() = default;
 
-        gin::Parameter::Ptr wave, voices, tune, finetune, level, pulsewidth,
-                            detune, spread, pan;
+        gin::Parameter::Ptr enable , wave, voices, tune, finetune, level,
+                            pulsewidth, detune, spread, pan;
 
         void setup (VirtualAnalogAudioProcessor& p, int idx);
 

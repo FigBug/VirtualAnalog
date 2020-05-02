@@ -22,22 +22,9 @@ private:
     gin::ControlHeader unisonHeader { "Unison" };
 
     CommonBox common { *this, proc };
-    UnisonBox unison { *this, proc };
 
-    gin::ControlHeader oscHeaders[4] =
-    {
-        { "OSC1" },
-        { "OSC2" },
-        { "OSC3" },
-        { "OSC4" },
-    };
-    OscillatorBox oscillators[4] =
-    {
-        { *this, proc, 0 },
-        { *this, proc, 1 },
-        { *this, proc, 2 },
-        { *this, proc, 3 },
-    };
+    gin::ControlHeader oscHeaders = { "Oscillators" };
+    OscillatorBox oscillators     = { *this, proc };
 
     gin::ControlHeader filterHeaders { "Filters" };
     

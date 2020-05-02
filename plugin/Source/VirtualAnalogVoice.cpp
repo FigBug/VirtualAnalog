@@ -97,7 +97,8 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     ScratchBuffer buffer (2, numSamples);
 
     for (int i = 0; i < numOSCs; i++)
-        oscillators[i].processAdding (currentMidiNotes[i], oscParams[i], buffer);
+        if (proc.oscParams[i].enable->isOn())
+            oscillators[i].processAdding (currentMidiNotes[i], oscParams[i], buffer);
 
     // Apply velocity
     buffer.applyGain (velocityToGain (currentlyPlayingNote.noteOnVelocity.asUnsignedFloat()));
@@ -128,6 +129,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
     for (int i = 0; i < numOSCs; i++)
     {
+        if (! proc.oscParams[i].enable->isOn()) continue;
+        
         currentMidiNotes[i] = float (note.initialNote + note.totalPitchbendInSemitones / 100.0);
         currentMidiNotes[i] += getValue (proc.oscParams[i].tune) + getValue (proc.oscParams[i].finetune) / 100.0f;
 
@@ -142,6 +145,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
     for (int i = 0; i < numFilters; i++)
     {
+        if (! proc.filterParams[i].enable->isOn()) continue;
+        
         filterADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
         filterADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
         filterADSRs[i].setDecay (getValue (proc.filterParams[i].attack));

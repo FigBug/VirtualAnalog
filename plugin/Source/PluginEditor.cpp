@@ -7,10 +7,10 @@ using namespace gin;
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
     : GinAudioProcessorEditor (p, 50, 50 + 15), proc (p)
 {
-    gin::addAndMakeVisible (*this, { &commonHeader, &common, &unisonHeader, &unison });
+    gin::addAndMakeVisible (*this, { &commonHeader, &common, &unisonHeader });
 
-    gin::addAndMakeVisible (*this, { &oscHeaders[0], &oscHeaders[1], &oscHeaders[2], &oscHeaders[3] });
-    gin::addAndMakeVisible (*this, { &oscillators[0], &oscillators[1], &oscillators[2], &oscillators[3] });
+    gin::addAndMakeVisible (*this, { &oscHeaders });
+    gin::addAndMakeVisible (*this, { &oscillators });
 
     gin::addAndMakeVisible (*this, { &filterHeaders });
     gin::addAndMakeVisible (*this, { &filters });
@@ -51,16 +51,10 @@ void VirtualAnalogAudioProcessorEditor::resized()
     // Oscillators
     {
         auto rHeaders = rc.removeFromTop (hh);
-        for (auto& c : oscHeaders)
-            c.setBounds (rHeaders.removeFromLeft (cx * 3));
-
-        unisonHeader.setBounds (rHeaders.removeFromLeft (cx * 2));
+        oscHeaders.setBounds (rHeaders.removeFromLeft (cx * 14));
 
         auto rOscs = rc.removeFromTop (cy * 2);
-        for (auto& c : oscillators)
-            c.setBounds (rOscs.removeFromLeft (cx * 3));
-
-        unison.setBounds (rOscs.removeFromLeft (cx * 2));
+        oscillators.setBounds (rOscs.removeFromLeft (cx * 14));
     }
 
     // Filters
