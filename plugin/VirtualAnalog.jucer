@@ -4,7 +4,7 @@
               companyName="SocaLabs" reportAppUsage="0" displaySplashScreen="0"
               pluginFormats="buildAU,buildVST" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
-              cppLanguageStandard="14" pluginChannelConfigs="{0,2}">
+              cppLanguageStandard="latest" pluginChannelConfigs="{0,2}">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
       <FILE id="f12Jxy" name="Boxes.h" compile="0" resource="0" file="Source/Boxes.h"/>
@@ -130,6 +130,7 @@
   </MODULES>
   <LIVE_SETTINGS>
     <OSX/>
+    <WINDOWS/>
   </LIVE_SETTINGS>
   <JUCEOPTIONS JUCE_VST3_CAN_REPLACE_VST2="0" JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
 </JUCERPROJECT>

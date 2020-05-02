@@ -84,7 +84,7 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
     String id = "osc" + String (idx + 1);
     String nm = "OSC" + String (idx + 1) + " ";
 
-    enable     = p.addIntParam (id + "enable",     nm + "Enable",      "Enable",    "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1 : 0, {});
+    enable     = p.addIntParam (id + "enable",     nm + "Enable",      "Enable",    "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1.0f : 0.0f, {});
     wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 1.0, 7.0, 1.0, 1.0 }, 1.0, {}, waveTextFunction);
     voices     = p.addIntParam (id + "voices",     nm + "Voices",      "Voices",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
@@ -104,7 +104,7 @@ void VirtualAnalogAudioProcessor::FilterParams::setup (VirtualAnalogAudioProcess
 
     float maxFreq = float (getMidiNoteFromHertz (20000.0));
 
-    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "",      "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1 : 0, {});
+    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "",      "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1.0f : 0.0f, {});
     type             = p.addIntParam (id + "type",    nm + "Type",    "Type",  "", { 0.0, 7.0, 1.0, 1.0 }, 0.0, {}, filterTextFunction);
     keyTracking      = p.addExtParam (id + "key",     nm + "Key",     "Key",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
     velocityTracking = p.addExtParam (id + "vel",     nm + "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
@@ -248,8 +248,8 @@ void VirtualAnalogAudioProcessor::CompressorParams::setup (VirtualAnalogAudioPro
     threshold = p.addExtParam ("cpThreshold", "Threshold", "", "",     { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
     gain      = p.addExtParam ("cpGain",      "Gain",      "", "",     { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
 
-    attack->conversionFunction  = [] (float in) { return in / 1000.0; };
-    release->conversionFunction = [] (float in) { return in / 1000.0; };
+    attack->conversionFunction  = [] (float in) { return in / 1000.0f; };
+    release->conversionFunction = [] (float in) { return in / 1000.0f; };
     gain->conversionFunction    = [] (float in) { return Decibels::decibelsToGain (in); };
 }
 
@@ -380,27 +380,27 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     modMatrix.build();
 }
 
-void VirtualAnalogAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void VirtualAnalogAudioProcessor::prepareToPlay (double newSampleRate, int newSamplesPerBlock)
 {
-    GinProcessor::prepareToPlay (sampleRate, samplesPerBlock);
+    GinProcessor::prepareToPlay (newSampleRate, newSamplesPerBlock);
     
-    bandLimitedLookupTables.setSampleRate (sampleRate);
-    setCurrentPlaybackSampleRate (sampleRate);
+    bandLimitedLookupTables.setSampleRate (newSampleRate);
+    setCurrentPlaybackSampleRate (newSampleRate);
 
-    modMatrix.setSampleRate (sampleRate);
+    modMatrix.setSampleRate (newSampleRate);
 
-    chorus.setSampleRate (sampleRate);
-    distortion.setSampleRate (sampleRate);
-    stereoDelay.setSampleRate (sampleRate);
-    compressor.setSampleRate (sampleRate);
-    limiter.setSampleRate (sampleRate);
+    chorus.setSampleRate (newSampleRate);
+    distortion.setSampleRate (newSampleRate);
+    stereoDelay.setSampleRate (newSampleRate);
+    compressor.setSampleRate (newSampleRate);
+    limiter.setSampleRate (newSampleRate);
 
-    eq.setSampleRate (sampleRate);
+    eq.setSampleRate (newSampleRate);
 
-    reverb.setSampleRate (sampleRate);
+    reverb.setSampleRate (newSampleRate);
 
     for (auto& l : modLFOs)
-        l.setSampleRate (sampleRate);
+        l.setSampleRate (newSampleRate);
 }
 
 void VirtualAnalogAudioProcessor::releaseResources()
@@ -471,7 +471,7 @@ void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)
     outputGain.process (buffer);
 }
 
-void VirtualAnalogAudioProcessor::updateParams (int blockSize)
+void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
 {
     // Update Mono LFOs
     for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
@@ -493,7 +493,7 @@ void VirtualAnalogAudioProcessor::updateParams (int blockSize)
         params.fade      = 0;
 
         modLFOs[i].setParameters (params);
-        modLFOs[i].process (blockSize);
+        modLFOs[i].process (newBlockSize);
     }
 
     // Update Chorus

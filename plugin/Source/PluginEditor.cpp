@@ -45,46 +45,46 @@ void VirtualAnalogAudioProcessorEditor::resized()
 
     int hh = 25;
 
-    int cx = getGridWidth();
-    int cy = getGridHeight();
+    int gx = getGridWidth();
+    int gy = getGridHeight();
 
     // Oscillators
     {
         auto rHeaders = rc.removeFromTop (hh);
-        oscHeaders.setBounds (rHeaders.removeFromLeft (cx * 14));
+        oscHeaders.setBounds (rHeaders.removeFromLeft (gx * 14));
 
-        auto rOscs = rc.removeFromTop (cy * 2);
-        oscillators.setBounds (rOscs.removeFromLeft (cx * 14));
+        auto rOscs = rc.removeFromTop (gy * 2);
+        oscillators.setBounds (rOscs.removeFromLeft (gx * 14));
     }
 
     // Filters
     {
         auto rHeaders = rc.removeFromTop (hh);
-        filterHeaders.setBounds (rHeaders.removeFromLeft (cx * 14));
+        filterHeaders.setBounds (rHeaders.removeFromLeft (gx * 14));
 
-        auto rFilters = rc.removeFromTop (cy * 2);
-        filters.setBounds (rFilters.removeFromLeft (cx * 14));
+        auto rFilters = rc.removeFromTop (gy * 2);
+        filters.setBounds (rFilters.removeFromLeft (gx * 14));
     }
 
     // ADSR and mod
     {
         auto rHeaders = rc.removeFromTop (hh);
-        adsrHeader.setBounds (rHeaders.removeFromLeft (cx * 5));
-        modulationHeader.setBounds (rHeaders.removeFromLeft (cx * 9));
+        adsrHeader.setBounds (rHeaders.removeFromLeft (gx * 5));
+        modulationHeader.setBounds (rHeaders.removeFromLeft (gx * 9));
 
-        auto rFilters = rc.removeFromTop (cy * 2);
-        adsr.setBounds (rFilters.removeFromLeft (cx * 5));
-        modulation.setBounds (rFilters.removeFromLeft (cx * 9));
+        auto rFilters = rc.removeFromTop (gy * 2);
+        adsr.setBounds (rFilters.removeFromLeft (gx * 5));
+        modulation.setBounds (rFilters.removeFromLeft (gx * 9));
     }
 
     // Effects & Common
     {
         auto rHeaders = rc.removeFromTop (hh);
-        effectsHeader.setBounds (rHeaders.removeFromLeft (cx * 10));
-        commonHeader.setBounds (rHeaders.removeFromLeft (cx * 4));
+        effectsHeader.setBounds (rHeaders.removeFromLeft (gx * 10));
+        commonHeader.setBounds (rHeaders.removeFromLeft (gx * 4));
 
-        auto rControls = rc.removeFromTop (cy * 2);
-        effects.setBounds (rControls.removeFromLeft (cx * 10));
-        common.setBounds (rControls.removeFromLeft (cx * 4));
+        auto rControls = rc.removeFromTop (gy * 2);
+        effects.setBounds (rControls.removeFromLeft (gx * 10));
+        common.setBounds (rControls.removeFromLeft (gx * 4));
     }
 }
