@@ -185,22 +185,26 @@ public:
         int cnt = 0;
         for (int i = 0; i < numElementsInArray (proc.lfoParams); i++, cnt++)
         {
-            auto& env = proc.lfoParams[i];
+            auto& lfo = proc.lfoParams[i];
 
-            addPage (i == 0 ? "LFO1" : "LFO2", 7, 2);
+            addPage (i == 0 ? "LFO1" : "LFO2", 5, 2);
 
-            addControl (cnt, new gin::Select (env.wave), 1, 0);
-            addControl (cnt, new gin::Switch (env.sync), 0, 0);
-            addControl (cnt, r[i] = new gin::Knob (env.rate), 2, 0);
-            addControl (cnt, b[i] = new gin::Select (env.beat), 2, 0);
-            addControl (cnt, new gin::Knob (env.depth), 3, 0);
+            addControl (cnt, new gin::Switch (lfo.sync), 0, 0);
+            addControl (cnt, new gin::Select (lfo.wave), 1, 0);
+            addControl (cnt, r[i] = new gin::Knob (lfo.rate), 2, 0);
+            addControl (cnt, b[i] = new gin::Select (lfo.beat), 2, 0);
 
-            addControl (cnt, new gin::Knob (env.phase), 0, 1);
-            addControl (cnt, new gin::Knob (env.offset), 1, 1);
-            addControl (cnt, new gin::Knob (env.fade), 2, 1);
-            addControl (cnt, new gin::Knob (env.delay), 3, 1);
+            addControl (cnt, new gin::Knob (lfo.depth, true), 0, 1);
+            addControl (cnt, new gin::Knob (lfo.phase, true), 1, 1);
+            addControl (cnt, new gin::Knob (lfo.offset, true), 2, 1);
+            addControl (cnt, new gin::Knob (lfo.fade, true), 3, 1);
+            addControl (cnt, new gin::Knob (lfo.delay), 4, 1);
 
-            watchParam (env.sync);
+            auto l = new gin::LFOComponent();
+            l->setParams (lfo.wave, lfo.sync, lfo.rate, lfo.beat, lfo.depth, lfo.offset, lfo.phase);
+            addControl (cnt, l, 3, 0, 2, 1);
+
+            watchParam (lfo.sync);
         }
 
         for (int i = 0; i < numElementsInArray (proc.envParams); i++, cnt++)

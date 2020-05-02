@@ -145,10 +145,10 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
     wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 12.0, 1.0, 1.0 }, 0.0, {}, lfoTextFunction);
     rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "", { 0.0, 500.0, 0.0, 0.3f }, 10.0, {});
     beat             = p.addExtParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, {}, durationTextFunction);
-    depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { 0.0, 1.0, 0.0, 1.0 }, 1.0, {});
-    phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { 0.0, 1.0, 0.0, 1.0 }, 0.0, {});
+    depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { -1.0, 1.0, 0.0, 1.0 }, 1.0, {});
+    phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
     offset           = p.addExtParam (id + "offset",  nm + "Offset",  "Offset", "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
-    fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "", { 0.0, 60.0, 0.0, 1.0 }, 0.1f, {});
+    fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "", { -60.0, 60.0, 0.0, 1.0 }, 0.1f, {});
     delay            = p.addExtParam (id + "delay",   nm + "Delay",   "Delay",  "", { 0.0, 60.0, 0.0, 1.0 }, 0.1f, {});
 }
 
