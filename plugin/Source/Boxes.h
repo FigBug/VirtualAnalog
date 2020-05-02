@@ -90,6 +90,10 @@ public:
             addControl (i, new gin::Knob (flt.velocityTracking), 1, 1);
             addControl (i, new gin::Knob (flt.amount), 2, 1);
 
+            auto adsr = new gin::ADSRComponent ();
+            adsr->setParams (flt.attack, flt.decay, flt.sustain, flt.release);
+            addControl (i, adsr, 3, 0, 3, 2);
+
             addControl (i, new gin::Knob (flt.attack), 6, 0);
             addControl (i, new gin::Knob (flt.decay), 7, 0);
             addControl (i, new gin::Knob (flt.sustain), 6, 1);
