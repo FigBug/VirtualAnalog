@@ -191,18 +191,18 @@ public:
     int modSrcPressure = 0, modSrcTimbre = 0, modScrPitchBend = 0,
         modSrcNote = 0, modSrcVelocity = 0;
 
-    int modSrcCC[119]                                   = {0};
-    int modSrcMonoLFO[VirtualAnalogVoice::numLFOs]      = {0};
-    int modSrcLFO[VirtualAnalogVoice::numLFOs]          = {0};
-    int modSrcFilter[VirtualAnalogVoice::numFilters]    = {0};
-    int modSrcEvn[VirtualAnalogVoice::numENVs]          = {0};
+    int modSrcCC[119]                    = {0};
+    int modSrcMonoLFO[Cfg::numLFOs]      = {0};
+    int modSrcLFO[Cfg::numLFOs]          = {0};
+    int modSrcFilter[Cfg::numFilters]    = {0};
+    int modSrcEnv[Cfg::numENVs]          = {0};
 
     //==============================================================================
 
-    OSCParams oscParams[VirtualAnalogVoice::numOSCs];
-    FilterParams filterParams[VirtualAnalogVoice::numFilters];
-    EnvParams envParams[VirtualAnalogVoice::numENVs];
-    LFOParams lfoParams[VirtualAnalogVoice::numLFOs];
+    OSCParams oscParams[Cfg::numOSCs];
+    FilterParams filterParams[Cfg::numFilters];
+    EnvParams envParams[Cfg::numENVs];
+    LFOParams lfoParams[Cfg::numLFOs];
 
     ADSRParams adsrParams;
 
@@ -228,7 +228,7 @@ public:
     //==============================================================================
     gin::ModMatrix modMatrix;
 
-    gin::LFO modLFOs[VirtualAnalogVoice::numLFOs];
+    gin::LFO modLFOs[Cfg::numLFOs];
 
     AudioPlayHead* playhead = nullptr;
 

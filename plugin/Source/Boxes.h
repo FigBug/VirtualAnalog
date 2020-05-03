@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "Cfg.h"
 
 //==============================================================================
 class CommonBox : public gin::ControlBox
@@ -70,7 +71,7 @@ public:
     
     void setOSC (int osc)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < Cfg::numOSCs; i++)
         {
             voices[i]->setVisible (osc == i);
             detune[i]->setVisible (osc == i);
@@ -79,7 +80,7 @@ public:
     }
 
     VirtualAnalogAudioProcessor& proc;
-    ParamComponentPtr pw[4], voices[4], detune[4], spread[4];
+    ParamComponentPtr pw[Cfg::numOSCs], voices[Cfg::numOSCs], detune[Cfg::numOSCs], spread[Cfg::numOSCs];
 };
 
 //==============================================================================
@@ -94,6 +95,7 @@ public:
             auto& flt = proc.filterParams[i];
             
             addPage ("Filter " + String (i + 1), 8, 2);
+            addBottomButton (i, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcFilter[i], true));
             addPageEnable (i, flt.enable);
 
             addControl (i, new gin::Select (flt.type), 0, 0);
@@ -134,8 +136,8 @@ public:
     }
 
     VirtualAnalogAudioProcessor& proc;
-    ParamComponentPtr v[2], a[2], d[2], s[2], r[2];
-    gin::ADSRComponent* adsr[2];
+    ParamComponentPtr v[Cfg::numFilters], a[Cfg::numFilters], d[Cfg::numFilters], s[Cfg::numFilters], r[Cfg::numFilters];
+    gin::ADSRComponent* adsr[Cfg::numFilters];
 };
 
 //==============================================================================
@@ -187,8 +189,10 @@ public:
         {
             auto& lfo = proc.lfoParams[i];
 
-            addPage (i == 0 ? "LFO1" : "LFO2", 5, 2);
+            addPage ("LFO" + String (i + 1), 5, 2);
             addPageEnable (cnt, lfo.enable);
+            addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcLFO[i], true));
+            addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcMonoLFO[i], false));
 
             addControl (cnt, new gin::Switch (lfo.sync), 0, 0);
             addControl (cnt, new gin::Select (lfo.wave), 1, 0);
@@ -212,8 +216,9 @@ public:
         {
             auto& env = proc.envParams[i];
 
-            addPage (i == 0 ? "ENV1" : "ENV2", 5, 2);
+            addPage ("ENV" + String (i + 1), 5, 2);
             addPageEnable (cnt, env.enable);
+            addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcEnv[i], true));
 
             addControl (cnt, new gin::Knob (env.attack), 0, 0);
             addControl (cnt, new gin::Knob (env.decay), 1, 0);
@@ -239,7 +244,7 @@ public:
     }
 
     VirtualAnalogAudioProcessor& proc;
-    ParamComponentPtr r[2], b[2];
+    ParamComponentPtr r[Cfg::numLFOs], b[Cfg::numLFOs];
 };
 
 //==============================================================================

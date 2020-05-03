@@ -7,6 +7,8 @@ using namespace gin;
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
     : GinAudioProcessorEditor (p, 50, 50 + 15), proc (p)
 {
+    oscHeaders.addChildComponent (modOverview);
+
     gin::addAndMakeVisible (*this, { &commonHeader, &common, &unisonHeader });
 
     gin::addAndMakeVisible (*this, { &oscHeaders });
@@ -55,6 +57,8 @@ void VirtualAnalogAudioProcessorEditor::resized()
 
         auto rOscs = rc.removeFromTop (gy * 2);
         oscillators.setBounds (rOscs.removeFromLeft (gx * 14));
+
+        modOverview.setBounds (4, 4, 200, hh - 8);
     }
 
     // Filters

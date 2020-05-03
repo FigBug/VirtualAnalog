@@ -18,6 +18,8 @@ public:
 private:
     VirtualAnalogAudioProcessor& proc;
 
+    gin::ModulationOverview modOverview { proc.modMatrix };
+
     gin::ControlHeader commonHeader { "Common" };
     gin::ControlHeader unisonHeader { "Unison" };
 

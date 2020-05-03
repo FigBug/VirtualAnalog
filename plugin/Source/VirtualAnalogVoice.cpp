@@ -96,7 +96,7 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     // Run OSC
     ScratchBuffer buffer (2, numSamples);
 
-    for (int i = 0; i < numOSCs; i++)
+    for (int i = 0; i < Cfg::numOSCs; i++)
         if (proc.oscParams[i].enable->isOn())
             oscillators[i].processAdding (currentMidiNotes[i], oscParams[i], buffer);
 
@@ -127,7 +127,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     
     proc.modMatrix.setPolyValue (*this, proc.modSrcNote, note.initialNote / 127.0f);
 
-    for (int i = 0; i < numOSCs; i++)
+    for (int i = 0; i < Cfg::numOSCs; i++)
     {
         if (! proc.oscParams[i].enable->isOn()) continue;
         
@@ -143,7 +143,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         oscParams[i].gain   = Decibels::decibelsToGain (getValue (proc.oscParams[i].level));
     }
 
-    for (int i = 0; i < numFilters; i++)
+    for (int i = 0; i < Cfg::numFilters; i++)
     {
         if (! proc.filterParams[i].enable->isOn()) continue;
         
@@ -208,7 +208,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         filterADSRs[i].process (blockSize);
     }
 
-    for (int i = 0; i < numENVs; i++)
+    for (int i = 0; i < Cfg::numENVs; i++)
     {
         if (proc.filterParams[i].enable->isOn())
         {
@@ -217,17 +217,17 @@ void VirtualAnalogVoice::updateParams (int blockSize)
             modADSRs[i].setDecay (getValue (proc.filterParams[i].attack));
             modADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
 
-            proc.modMatrix.setPolyValue (*this, proc.modSrcEvn[i], modADSRs[i].getOutput());
+            proc.modMatrix.setPolyValue (*this, proc.modSrcEnv[i], modADSRs[i].getOutput());
 
             modADSRs[i].process (blockSize);
         }
         else
         {
-            proc.modMatrix.setPolyValue (*this, proc.modSrcEvn[i], 0.0f);
+            proc.modMatrix.setPolyValue (*this, proc.modSrcEnv[i], 0.0f);
         }
     }
     
-    for (int i = 0; i < numLFOs; i++)
+    for (int i = 0; i < Cfg::numLFOs; i++)
     {
         if (proc.lfoParams[i].enable->isOn())
         {

@@ -352,28 +352,28 @@ VirtualAnalogAudioProcessor::~VirtualAnalogAudioProcessor()
 //==============================================================================
 void VirtualAnalogAudioProcessor::setupModMatrix()
 {
-    modSrcPressure  = modMatrix.addPolyModSource ("mpePressure");
-    modSrcTimbre    = modMatrix.addPolyModSource ("mpeTimbre");
+    modSrcPressure  = modMatrix.addPolyModSource ("MPE Pressure");
+    modSrcTimbre    = modMatrix.addPolyModSource ("MPE Timbre");
 
-    modScrPitchBend = modMatrix.addMonoModSource ("pitchBend");
+    modScrPitchBend = modMatrix.addMonoModSource ("Pitch Bend");
 
-    modSrcNote      = modMatrix.addPolyModSource ("note");
-    modSrcVelocity  = modMatrix.addPolyModSource ("velocity");
+    modSrcNote      = modMatrix.addPolyModSource ("MIDI Note Number");
+    modSrcVelocity  = modMatrix.addPolyModSource ("MIDI Velocity");
 
     for (int i = 0; i <= 119; i++)
-        modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("cc%d", i));
+        modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("MIDI CC %d", i));
 
-    for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
-        modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("mlfo%d", i));
+    for (int i = 0; i < Cfg::numLFOs; i++)
+        modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1));
 
-    for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
-        modSrcLFO[i] = modMatrix.addPolyModSource (String::formatted ("lfo%d", i));
+    for (int i = 0; i < Cfg::numLFOs; i++)
+        modSrcLFO[i] = modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1));
 
-    for (int i = 0; i < VirtualAnalogVoice::numFilters; i++)
-        modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("fenv%d", i));
+    for (int i = 0; i < Cfg::numFilters; i++)
+        modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1));
 
-    for (int i = 0; i < VirtualAnalogVoice::numENVs; i++)
-        modSrcEvn[i] = modMatrix.addPolyModSource (String::formatted ("env%d", i));
+    for (int i = 0; i < Cfg::numENVs; i++)
+        modSrcEnv[i] = modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1));
 
     for (auto pp : getPluginParameters())
         if (! pp->isInternal())
@@ -476,7 +476,7 @@ void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)
 void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
 {
     // Update Mono LFOs
-    for (int i = 0; i < VirtualAnalogVoice::numLFOs; i++)
+    for (int i = 0; i < Cfg::numLFOs; i++)
     {
         if (lfoParams[i].enable->isOn())
         {

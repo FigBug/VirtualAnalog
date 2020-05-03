@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Cfg.h"
 
 class VirtualAnalogAudioProcessor;
 
@@ -9,11 +10,6 @@ class VirtualAnalogVoice : public MPESynthesiserVoice,
                            public gin::ModVoice
 {
 public:
-    static const int numOSCs    = 4;
-    static const int numFilters = 2;
-    static const int numENVs    = 2;
-    static const int numLFOs    = 2;
-
     VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, gin::BandLimitedLookupTables& bandLimitedLookupTables);
     
     void noteStarted() override;
@@ -34,7 +30,7 @@ private:
     VirtualAnalogAudioProcessor& proc;
     gin::BandLimitedLookupTables& bandLimitedLookupTables;
 
-    gin::VoicedStereoOscillator oscillators[numOSCs] =
+    gin::VoicedStereoOscillator oscillators[Cfg::numOSCs] =
     {
         bandLimitedLookupTables,
         bandLimitedLookupTables,
@@ -42,14 +38,14 @@ private:
         bandLimitedLookupTables,
     };
 
-    gin::Filter filters[numFilters];
-    gin::ADSR filterADSRs[numFilters];
+    gin::Filter filters[Cfg::numFilters];
+    gin::ADSR filterADSRs[Cfg::numFilters];
     
-    gin::ADSR modADSRs[numENVs];
-    gin::LFO modLFOs[numLFOs];
+    gin::ADSR modADSRs[Cfg::numENVs];
+    gin::LFO modLFOs[Cfg::numLFOs];
 
     gin::AnalogADSR adsr;
 
-    float currentMidiNotes[numOSCs];
-    gin::VoicedStereoOscillator::Params oscParams[numOSCs];
+    float currentMidiNotes[Cfg::numOSCs];
+    gin::VoicedStereoOscillator::Params oscParams[Cfg::numOSCs];
 };
