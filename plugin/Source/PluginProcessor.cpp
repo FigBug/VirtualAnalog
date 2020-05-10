@@ -352,28 +352,28 @@ VirtualAnalogAudioProcessor::~VirtualAnalogAudioProcessor()
 //==============================================================================
 void VirtualAnalogAudioProcessor::setupModMatrix()
 {
-    modSrcPressure  = modMatrix.addPolyModSource ("MPE Pressure");
-    modSrcTimbre    = modMatrix.addPolyModSource ("MPE Timbre");
+    modSrcPressure  = modMatrix.addPolyModSource ("MPE Pressure", false);
+    modSrcTimbre    = modMatrix.addPolyModSource ("MPE Timbre", false);
 
-    modScrPitchBend = modMatrix.addMonoModSource ("Pitch Bend");
+    modScrPitchBend = modMatrix.addMonoModSource ("Pitch Bend", true);
 
-    modSrcNote      = modMatrix.addPolyModSource ("MIDI Note Number");
-    modSrcVelocity  = modMatrix.addPolyModSource ("MIDI Velocity");
+    modSrcNote      = modMatrix.addPolyModSource ("MIDI Note Number", false);
+    modSrcVelocity  = modMatrix.addPolyModSource ("MIDI Velocity", false);
 
     for (int i = 0; i <= 119; i++)
-        modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("MIDI CC %d", i));
+        modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("MIDI CC %d", i), false);
 
     for (int i = 0; i < Cfg::numLFOs; i++)
-        modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1));
+        modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1), true);
 
     for (int i = 0; i < Cfg::numLFOs; i++)
-        modSrcLFO[i] = modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1));
+        modSrcLFO[i] = modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1), true);
 
     for (int i = 0; i < Cfg::numFilters; i++)
-        modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1));
+        modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1), false);
 
     for (int i = 0; i < Cfg::numENVs; i++)
-        modSrcEnv[i] = modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1));
+        modSrcEnv[i] = modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1), false);
 
     for (auto pp : getPluginParameters())
         if (! pp->isInternal())

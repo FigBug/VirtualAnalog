@@ -23,6 +23,8 @@ public:
     void setCurrentSampleRate (double newRate) override;
 
     void renderNextBlock (AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
+
+    bool isVoiceActive() override;
     
 private:
     void updateParams (int blockSize);

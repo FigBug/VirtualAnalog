@@ -263,3 +263,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     adsr.setSustainLevel (getValue (proc.adsrParams.sustain));
     adsr.setRelease (getValue (proc.adsrParams.release));
 }
+
+bool VirtualAnalogVoice::isVoiceActive()
+{
+    return isActive();
+}
