@@ -77,6 +77,10 @@ static String filterTextFunction (const Parameter&, float v)
     }
 }
 
+static String freqTextFunction (const Parameter&, float v)
+{
+    return String ( int ( getMidiNoteInHertz ( v ) ) );
+}
 
 //==============================================================================
 void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor& p, int idx)
@@ -108,7 +112,7 @@ void VirtualAnalogAudioProcessor::FilterParams::setup (VirtualAnalogAudioProcess
     type             = p.addIntParam (id + "type",    nm + "Type",    "Type",  "", { 0.0, 7.0, 1.0, 1.0 }, 0.0, {}, filterTextFunction);
     keyTracking      = p.addExtParam (id + "key",     nm + "Key",     "Key",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
     velocityTracking = p.addExtParam (id + "vel",     nm + "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
-    frequency        = p.addExtParam (id + "freq",    nm + "Freq",    "Freq",  "", { 0.0, maxFreq, 0.0, 1.0 }, 64.0, {});
+    frequency        = p.addExtParam (id + "freq",    nm + "Freq",    "Freq",  "", { 0.0, maxFreq, 0.0, 1.0 }, 64.0, {}, freqTextFunction);
     resonance        = p.addExtParam (id + "res",     nm + "Res",     "Res",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
     amount           = p.addExtParam (id + "amount",  nm + "Amount",  "Amnt",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
     attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
@@ -212,20 +216,20 @@ void VirtualAnalogAudioProcessor::EQParams::setup (VirtualAnalogAudioProcessor& 
 
     enable   = p.addIntParam ("eqEnable",    "Enable",      "",     "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
 
-    loFreq   = p.addExtParam ("eqLoFreq",    "Lo Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d1, {});
-    loQ      = p.addExtParam ("eqLoQ",       "Lo Q",        "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    loFreq   = p.addExtParam ("eqLoFreq",    "Lo Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d1, {}, freqTextFunction);
+    loQ      = p.addExtParam ("eqLoQ",       "Lo Q",        "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
     loGain   = p.addExtParam ("eqLoGain",    "Lo Gain",     "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
-    mid1Freq = p.addExtParam ("eqM1Freq",    "Min 1 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d2, {});
-    mid1Q    = p.addExtParam ("eqM1Q",       "Min 1 Q",     "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    mid1Freq = p.addExtParam ("eqM1Freq",    "Min 1 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d2, {}, freqTextFunction);
+    mid1Q    = p.addExtParam ("eqM1Q",       "Min 1 Q",     "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
     mid1Gain = p.addExtParam ("eqM1Gain",    "Min 1 Gain",  "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
-    mid2Freq = p.addExtParam ("eqM2Freq",    "Mid 2 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d3, {});
-    mid2Q    = p.addExtParam ("eqM2Q",       "Mid 2 Q",     "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    mid2Freq = p.addExtParam ("eqM2Freq",    "Mid 2 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d3, {}, freqTextFunction);
+    mid2Q    = p.addExtParam ("eqM2Q",       "Mid 2 Q",     "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
     mid2Gain = p.addExtParam ("eqM2Gain",    "Mid 2 Gain",  "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
-    hiFreq   = p.addExtParam ("eqHiFreq",    "Hi Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d4, {});
-    hiQ      = p.addExtParam ("eqHiQ",       "Hi Q",        "Q",    "", { 0.1f, 4.0f, 0.0, 1.0 }, 0.5f, {});
+    hiFreq   = p.addExtParam ("eqHiFreq",    "Hi Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d4, {}, freqTextFunction);
+    hiQ      = p.addExtParam ("eqHiQ",       "Hi Q",        "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
     hiGain   = p.addExtParam ("eqHiGain",    "Hi Gain",     "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
     loFreq->conversionFunction   = [] (float in) { return getMidiNoteInHertz (in); };
@@ -321,8 +325,9 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
     for (int i = 0; i < numElementsInArray (lfoParams); i++)
         lfoParams[i].setup (*this, i);
 
-    adsrParams.setup (*this);
     globalParams.setup (*this);
+    adsrParams.setup (*this);
+
     chorusParams.setup (*this);
     distortionParams.setup (*this);
     eqParams.setup (*this);
@@ -347,6 +352,17 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 
 VirtualAnalogAudioProcessor::~VirtualAnalogAudioProcessor()
 {
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::stateUpdated()
+{
+    modMatrix.stateUpdated (state);
+}
+
+void VirtualAnalogAudioProcessor::updateState()
+{
+    modMatrix.updateState (state);
 }
 
 //==============================================================================
@@ -437,6 +453,21 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     }
 
     playHead = nullptr;
+}
+
+Array<float> VirtualAnalogAudioProcessor::getLiveFilterCutoff (int i)
+{
+    Array<float> values;
+
+    for (auto v : voices)
+    {
+        if (v->isActive())
+        {
+            auto vav = dynamic_cast<VirtualAnalogVoice*>(v);
+            values.add (vav->getFilterCutoffNormalized (i));
+        }
+    }
+    return values;
 }
 
 void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)

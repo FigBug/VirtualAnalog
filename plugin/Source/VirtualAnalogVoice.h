@@ -25,7 +25,9 @@ public:
     void renderNextBlock (AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
 
     bool isVoiceActive() override;
-    
+
+    float getFilterCutoffNormalized (int idx);
+
 private:
     void updateParams (int blockSize);
 

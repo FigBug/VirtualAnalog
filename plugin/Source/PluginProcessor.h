@@ -13,6 +13,9 @@ public:
     VirtualAnalogAudioProcessor();
     ~VirtualAnalogAudioProcessor() override;
 
+    void stateUpdated() override;
+    void updateState() override;
+
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -32,6 +35,7 @@ public:
     void handleMidiEvent (const MidiMessage& m) override;
     void handleController (int ch, int num, int val) override;
     //==============================================================================
+    Array<float> getLiveFilterCutoff (int idx);
 
     void applyEffects (AudioSampleBuffer& buffer);
 

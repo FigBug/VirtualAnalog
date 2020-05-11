@@ -99,7 +99,8 @@ public:
             addPageEnable (i, flt.enable);
 
             addControl (i, new gin::Select (flt.type), 0, 0);
-            addControl (i, new gin::Knob (flt.frequency), 1, 0);
+            auto freq = new gin::Knob (flt.frequency);
+            addControl (i, freq, 1, 0);
             addControl (i, new gin::Knob (flt.resonance), 2, 0);
 
             addControl (i, new gin::Knob (flt.keyTracking), 0, 1);
@@ -116,6 +117,13 @@ public:
             addControl (i, r[i] = new gin::Knob (flt.release), 7, 1);
 
             watchParam (flt.amount);
+
+            freq->setLiveValuesCallback ([this, i] ()
+            {
+                if (proc.filterParams[i].amount->getUserValue() != 0.0f)
+                    return proc.getLiveFilterCutoff (i);
+                return Array<float>();
+            });
         }
     }
 

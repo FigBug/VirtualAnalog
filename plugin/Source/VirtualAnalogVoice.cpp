@@ -35,10 +35,10 @@ void VirtualAnalogVoice::noteStarted()
     }
 
     for (auto& a : modADSRs)
-     {
+    {
          a.reset();
          a.noteOn();
-     }
+    }
     
     for (auto& l : modLFOs)
     {
@@ -53,7 +53,13 @@ void VirtualAnalogVoice::noteStarted()
 void VirtualAnalogVoice::noteStopped (bool allowTailOff)
 {
     adsr.noteOff();
-    
+
+    for (auto& a : filterADSRs)
+        a.noteOff();
+
+    for (auto& a : modADSRs)
+        a.noteOff();
+
     if (! allowTailOff)
         clearCurrentNote();
 }
@@ -148,9 +154,9 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         if (! proc.filterParams[i].enable->isOn()) continue;
         
         filterADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
-        filterADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
-        filterADSRs[i].setDecay (getValue (proc.filterParams[i].attack));
-        filterADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
+        filterADSRs[i].setSustainLevel (getValue (proc.filterParams[i].sustain));
+        filterADSRs[i].setDecay (getValue (proc.filterParams[i].decay));
+        filterADSRs[i].setRelease (getValue (proc.filterParams[i].release));
 
         float filterWidth = float (getMidiNoteFromHertz (20000.0));
         float filterEnv   = filterADSRs[i].getOutput();
@@ -267,4 +273,10 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 bool VirtualAnalogVoice::isVoiceActive()
 {
     return isActive();
+}
+
+float VirtualAnalogVoice::getFilterCutoffNormalized (int idx)
+{
+    float freq = filters[idx].getFrequency();
+    return proc.filterParams[idx].frequency->getUserRange().convertTo0to1 (getMidiNoteFromHertz (freq));
 }
