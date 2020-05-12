@@ -34,28 +34,25 @@ public:
             auto& osc = proc.oscParams[i];
             
             addPage ("OSC " + String (i + 1), 3, 2);
-            addPageEnable (i, osc.enable);
+            addPageEnable (i * 2, osc.enable);
 
-            addControl (i, new gin::Select (osc.wave), 0, 0);
-            addControl (i, new gin::Knob (osc.tune, true), 1, 0);
-            addControl (i, new gin::Knob (osc.finetune, true), 2, 0);
-            addControl (i, new gin::Knob (osc.pan, true), 0, 1);
-            addControl (i, new gin::Knob (osc.level), 1, 1);
-            addControl (i, pw[i] = new gin::Knob (osc.pulsewidth), 2, 1);
+            addControl (i * 2, new gin::Select (osc.wave), 0, 0);
+            addControl (i * 2, new gin::Knob (osc.tune, true), 1, 0);
+            addControl (i * 2, new gin::Knob (osc.finetune, true), 2, 0);
+            addControl (i * 2, new gin::Knob (osc.pan, true), 0, 1);
+            addControl (i * 2, new gin::Knob (osc.level), 1, 1);
+            addControl (i * 2, pw[i] = new gin::Knob (osc.pulsewidth), 2, 1);
 
             watchParam (osc.wave);
-        }
-        
-        addPage ("Unison", 2, 2);
-        for (int i = 0; i < 4; i++)
-        {
-            auto& osc = proc.oscParams[i];
 
-            addControl (4, voices[i] = new gin::Knob (osc.voices), 1, 0);
-            addControl (4, detune[i] = new gin::Knob (osc.detune), 0, 1);
-            addControl (4, spread[i] = new gin::Knob (osc.spread), 1, 1);
+            addPage ("Unison " + String (i + 1), 2, 2);
+            addControl (i * 2 + 1, new gin::Knob (osc.voices), 0, 0);
+            addControl (i * 2 + 1, trans[i] = new gin::Knob (osc.voicesTrns, true), 1, 0);
+            addControl (i * 2 + 1, new gin::Knob (osc.detune), 0, 1);
+            addControl (i * 2 + 1, new gin::Knob (osc.spread), 1, 1);
+
+            watchParam (osc.voices);
         }
-        setOSC (0);
     }
 
     void paramChanged () override
@@ -66,21 +63,13 @@ public:
         {
             auto& osc = proc.oscParams[i];
             pw[i]->setEnabled ((gin::Wave) int (osc.wave->getProcValue()) == gin::Wave::pulse);
-        }
-    }
-    
-    void setOSC (int osc)
-    {
-        for (int i = 0; i < Cfg::numOSCs; i++)
-        {
-            voices[i]->setVisible (osc == i);
-            detune[i]->setVisible (osc == i);
-            spread[i]->setVisible (osc == i);
+
+            trans[i]->setEnabled (osc.voices->getProcValue() > 1);
         }
     }
 
     VirtualAnalogAudioProcessor& proc;
-    ParamComponentPtr pw[Cfg::numOSCs], voices[Cfg::numOSCs], detune[Cfg::numOSCs], spread[Cfg::numOSCs];
+    ParamComponentPtr pw[Cfg::numOSCs], trans[Cfg::numOSCs];
 };
 
 //==============================================================================
@@ -120,7 +109,8 @@ public:
 
             freq->setLiveValuesCallback ([this, i] ()
             {
-                if (proc.filterParams[i].amount->getUserValue() != 0.0f)
+                if (proc.filterParams[i].amount->getUserValue()      != 0.0f ||
+                    proc.filterParams[i].keyTracking->getUserValue() != 0.0f)
                     return proc.getLiveFilterCutoff (i);
                 return Array<float>();
             });

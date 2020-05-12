@@ -14,6 +14,8 @@ VirtualAnalogVoice::VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, BandLimi
 
 void VirtualAnalogVoice::noteStarted()
 {
+    startVoice();
+
     auto note = getCurrentlyPlayingNote();
     proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
@@ -61,7 +63,10 @@ void VirtualAnalogVoice::noteStopped (bool allowTailOff)
         a.noteOff();
 
     if (! allowTailOff)
+    {
         clearCurrentNote();
+        stopVoice();
+    }
 }
 
 void VirtualAnalogVoice::notePressureChanged()
@@ -118,7 +123,10 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
     adsr.processMultiplying (buffer);
     
     if (adsr.getState() == AnalogADSR::State::idle)
+    {
         clearCurrentNote();
+        stopVoice();
+    }
 
     // Copy output to synth
     outputBuffer.addFrom (0, startSample, buffer, 0, 0, numSamples);
@@ -142,6 +150,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
         oscParams[i].wave   = (Wave) int (proc.oscParams[i].wave->getProcValue());
         oscParams[i].voices = int (proc.oscParams[i].voices->getProcValue());
+        oscParams[i].vcTrns = int (proc.oscParams[i].voicesTrns->getProcValue());
         oscParams[i].pw     = getValue (proc.oscParams[i].pulsewidth) / 100.0f;
         oscParams[i].pan    = getValue (proc.oscParams[i].pan);
         oscParams[i].spread = getValue (proc.oscParams[i].spread) / 100.0f;

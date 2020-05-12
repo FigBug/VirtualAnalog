@@ -90,7 +90,8 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
 
     enable     = p.addIntParam (id + "enable",     nm + "Enable",      "Enable",    "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1.0f : 0.0f, {});
     wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 1.0, 7.0, 1.0, 1.0 }, 1.0, {}, waveTextFunction);
-    voices     = p.addIntParam (id + "voices",     nm + "Voices",      "Voices",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
+    voices     = p.addIntParam (id + "unison",     nm + "Unison",      "Unison",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
+    voicesTrns = p.addExtParam (id + "unisontrns", nm + "Unison Trns", "LTrans",    "", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
     finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine",      "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
     level      = p.addExtParam (id + "level",      nm + "Level",       "Level",     "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
@@ -327,7 +328,6 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 
     globalParams.setup (*this);
     adsrParams.setup (*this);
-
     chorusParams.setup (*this);
     distortionParams.setup (*this);
     eqParams.setup (*this);
@@ -391,9 +391,18 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     for (int i = 0; i < Cfg::numENVs; i++)
         modSrcEnv[i] = modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1), false);
 
+    auto firstMonoParam = globalParams.mode;
+    bool polyParam = true;
     for (auto pp : getPluginParameters())
+    {
+        if (pp == firstMonoParam)
+            polyParam = false;
+
         if (! pp->isInternal())
-            modMatrix.addParameter (pp);
+        {
+            modMatrix.addParameter (pp, polyParam);
+        }
+    }
 
     modMatrix.build();
 }
@@ -530,7 +539,7 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
             modLFOs[i].setParameters (params);
             modLFOs[i].process (newBlockSize);
 
-            modMatrix.setMonoValue (modSrcMonoLFO[i], 0);
+            modMatrix.setMonoValue (modSrcMonoLFO[i], modLFOs[i].getOutput());
         }
         else
         {
