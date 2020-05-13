@@ -377,7 +377,13 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     modSrcVelocity  = modMatrix.addPolyModSource ("MIDI Velocity", false);
 
     for (int i = 0; i <= 119; i++)
-        modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("MIDI CC %d", i), false);
+	{
+		String name = MidiMessage::getControllerName (i);
+		if (name.isEmpty())
+			modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("CC %d", i), false);
+		else
+			modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("CC %d ", i) + name, false);
+	}
 
     for (int i = 0; i < Cfg::numLFOs; i++)
         modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1), true);

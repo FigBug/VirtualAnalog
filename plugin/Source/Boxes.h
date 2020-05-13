@@ -48,8 +48,8 @@ public:
             addPage ("Unison " + String (i + 1), 2, 2);
             addControl (i * 2 + 1, new gin::Knob (osc.voices), 0, 0);
             addControl (i * 2 + 1, trans[i] = new gin::Knob (osc.voicesTrns, true), 1, 0);
-            addControl (i * 2 + 1, new gin::Knob (osc.detune), 0, 1);
-            addControl (i * 2 + 1, new gin::Knob (osc.spread), 1, 1);
+            addControl (i * 2 + 1, detune[i] = new gin::Knob (osc.detune), 0, 1);
+            addControl (i * 2 + 1, spread[i] = new gin::Knob (osc.spread), 1, 1);
 
             watchParam (osc.voices);
         }
@@ -65,11 +65,13 @@ public:
             pw[i]->setEnabled ((gin::Wave) int (osc.wave->getProcValue()) == gin::Wave::pulse);
 
             trans[i]->setEnabled (osc.voices->getProcValue() > 1);
+            detune[i]->setEnabled (osc.voices->getProcValue() > 1);
+            spread[i]->setEnabled (osc.voices->getProcValue() > 1);
         }
     }
 
     VirtualAnalogAudioProcessor& proc;
-    ParamComponentPtr pw[Cfg::numOSCs], trans[Cfg::numOSCs];
+    ParamComponentPtr pw[Cfg::numOSCs], trans[Cfg::numOSCs], detune[Cfg::numOSCs], spread[Cfg::numOSCs];
 };
 
 //==============================================================================
@@ -110,7 +112,8 @@ public:
             freq->setLiveValuesCallback ([this, i] ()
             {
                 if (proc.filterParams[i].amount->getUserValue()      != 0.0f ||
-                    proc.filterParams[i].keyTracking->getUserValue() != 0.0f)
+                    proc.filterParams[i].keyTracking->getUserValue() != 0.0f ||
+					proc.modMatrix.isModulated (proc.filterParams[i].frequency->getModIndex()))
                     return proc.getLiveFilterCutoff (i);
                 return Array<float>();
             });
@@ -227,6 +230,9 @@ public:
             adsr->setParams (env.attack, env.decay, env.sustain, env.release);
             addControl (cnt, adsr, 2, 0, 3, 2);
         }
+
+		addPage ("All", 6, 2);
+		addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 6, 2);
     }
 
     void paramChanged () override
