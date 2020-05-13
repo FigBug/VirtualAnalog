@@ -6,7 +6,7 @@
 class VirtualAnalogAudioProcessor;
 
 //==============================================================================
-class VirtualAnalogVoice : public MPESynthesiserVoice,
+class VirtualAnalogVoice : public gin::SynthesiserVoice,
                            public gin::ModVoice
 {
 public:

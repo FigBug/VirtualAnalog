@@ -82,6 +82,19 @@ static String freqTextFunction (const Parameter&, float v)
     return String ( int ( getMidiNoteInHertz ( v ) ) );
 }
 
+static String voiceModeTextFunction (const Parameter&, float v)
+{
+    switch (int (v))
+    {
+        case 0: return "mono";
+        case 1: return "legato";
+        case 2: return "poly";
+        default:
+            jassertfalse;
+            return {};
+    }
+}
+
 //==============================================================================
 void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor& p, int idx)
 {
@@ -174,10 +187,10 @@ void VirtualAnalogAudioProcessor::ADSRParams::setup (VirtualAnalogAudioProcessor
 //==============================================================================
 void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    mode    = p.addIntParam ("mode",    "Mode",     "",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
-    legato  = p.addExtParam ("legato",  "Legato",   "",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
+    mode    = p.addIntParam ("mode",    "Mode",     "",   "", { 0.0, 2.0, 0.0, 1.0 }, 2.0, {}, voiceModeTextFunction);
+    legato  = p.addExtParam ("legato",  "Legato",   "",   "", { 0.0, 500.0, 0.0, 1.0 }, 0.0, {});
     level   = p.addExtParam ("level",   "Level",    "",   "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
-    voices  = p.addIntParam ("voices",  "Voices",   "",   "", { 0.0, 82.0, 1.0, 1.0 }, 32.0, {});
+    voices  = p.addIntParam ("voices",  "Voices",   "",   "", { 0.0, 40.0, 1.0, 1.0 }, 40.0, {});
 
     level->conversionFunction = [] (float in) { return Decibels::decibelsToGain (in); };
 }
@@ -340,7 +353,7 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
     compressor.setNumChannels (2);
     limiter.setNumChannels (2);
 
-    for (int i = 0; i < 36; i++)
+    for (int i = 0; i < 50; i++)
     {
         auto voice = new VirtualAnalogVoice (*this, bandLimitedLookupTables);
         modMatrix.addVoice (voice);
@@ -449,6 +462,8 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     int todo = buffer.getNumSamples();
     
     buffer.clear();
+    
+    setNumVoices (globalParams.mode->getProcValue() == 0.0 ? 1 : int (globalParams.voices->getProcValue()));
     
     while (todo > 0)
     {

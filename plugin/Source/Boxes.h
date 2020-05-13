@@ -5,21 +5,34 @@
 #include "Cfg.h"
 
 //==============================================================================
-class CommonBox : public gin::ControlBox
+class CommonBox : public gin::PagedControlBox
 {
 public:
-    CommonBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
-        : gin::ControlBox (e)
+    CommonBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+        : gin::PagedControlBox (e), proc (proc_)
     {
-        add (level = new gin::Knob (proc.globalParams.level));
-    }
+        auto& g = proc.globalParams;
+        
+        addPage ("Main", 2, 2);
 
-    void resized() override
+        addControl (0, new gin::Select (g.mode), 0, 0);
+        addControl (0, legato = new gin::Knob (g.legato), 1, 0);
+        addControl (0, new gin::Knob (g.voices), 0, 1);
+        addControl (0, new gin::Knob (g.level), 1, 1);
+        
+        watchParam (g.mode);
+    }
+    
+    void paramChanged() override
     {
-        level->setBounds (getGridArea (0, 0));
+        gin::PagedControlBox::paramChanged();
+        
+        auto& g = proc.globalParams;
+        legato->setEnabled (g.mode->getProcValue() == 1.0f);
     }
-
-    ParamComponentPtr level;
+    
+    VirtualAnalogAudioProcessor& proc;
+    ParamComponentPtr legato;
 };
 
 //==============================================================================
@@ -55,9 +68,9 @@ public:
         }
     }
 
-    void paramChanged () override
+    void paramChanged() override
     {
-        gin::PagedControlBox::paramChanged ();
+        gin::PagedControlBox::paramChanged();
 
         for ( int i = 0; i < numElementsInArray (proc.oscParams); i++)
         {

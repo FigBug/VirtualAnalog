@@ -14,6 +14,7 @@ VirtualAnalogVoice::VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, BandLimi
 
 void VirtualAnalogVoice::noteStarted()
 {
+    fastKill = false;
     startVoice();
 
     auto note = getCurrentlyPlayingNote();
@@ -276,7 +277,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     adsr.setAttack (getValue (proc.adsrParams.attack));
     adsr.setDecay (getValue (proc.adsrParams.decay));
     adsr.setSustainLevel (getValue (proc.adsrParams.sustain));
-    adsr.setRelease (getValue (proc.adsrParams.release));
+    adsr.setRelease (fastKill ? 0.01f : getValue (proc.adsrParams.release));
 }
 
 bool VirtualAnalogVoice::isVoiceActive()

@@ -6,7 +6,7 @@
 
 //==============================================================================
 class VirtualAnalogAudioProcessor : public gin::GinProcessor,
-                                    public MPESynthesiser
+                                    public gin::Synthesiser
 {
 public:
     //==============================================================================
