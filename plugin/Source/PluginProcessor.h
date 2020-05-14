@@ -103,7 +103,7 @@ public:
     {
         GlobalParams() = default;
 
-        gin::Parameter::Ptr mode, legato, level, voices;
+        gin::Parameter::Ptr mono, glideMode, glideRate, legato, level, voices;
 
         void setup (VirtualAnalogAudioProcessor& p);
 

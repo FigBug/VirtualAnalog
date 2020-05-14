@@ -13,14 +13,18 @@ public:
     {
         auto& g = proc.globalParams;
         
-        addPage ("Main", 2, 2);
+        addPage ("Main", 3, 2);
 
-        addControl (0, new gin::Select (g.mode), 0, 0);
-        addControl (0, legato = new gin::Knob (g.legato), 1, 0);
-        addControl (0, new gin::Knob (g.voices), 0, 1);
-        addControl (0, new gin::Knob (g.level), 1, 1);
+        addControl (0, new gin::Knob (g.level), 0, 0);
+        addControl (0, new gin::Switch (g.mono), 1, 0);
+        addControl (0, new gin::Select (g.glideMode), 2, 0);
+
+        addControl (0, v = new gin::Knob (g.voices), 0, 1);
+        addControl (0, l = new gin::Switch (g.legato), 1, 1);
+        addControl (0, s = new gin::Knob (g.glideRate), 2, 1);
         
-        watchParam (g.mode);
+        watchParam (g.mono);
+        watchParam (g.glideMode);
     }
     
     void paramChanged() override
@@ -28,11 +32,13 @@ public:
         gin::PagedControlBox::paramChanged();
         
         auto& g = proc.globalParams;
-        legato->setEnabled (g.mode->getProcValue() == 1.0f);
+        v->setEnabled (! g.mono->isOn());
+        l->setEnabled (g.glideMode->getProcValue() != 0.0f);
+        s->setEnabled (g.glideMode->getProcValue() != 0.0f);
     }
     
     VirtualAnalogAudioProcessor& proc;
-    ParamComponentPtr legato;
+    ParamComponentPtr v, l, s;
 };
 
 //==============================================================================

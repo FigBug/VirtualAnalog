@@ -18,6 +18,7 @@ void VirtualAnalogVoice::noteStarted()
     startVoice();
 
     auto note = getCurrentlyPlayingNote();
+    DBG ("Note started: " + String (note.initialNote));
 
     proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
@@ -54,8 +55,33 @@ void VirtualAnalogVoice::noteStarted()
     adsr.noteOn();
 }
 
+void VirtualAnalogVoice::noteRetriggered()
+{
+    auto note = getCurrentlyPlayingNote();
+    
+    proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
+    proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
+    proc.modMatrix.setPolyValue (*this, proc.modSrcPressure, note.pressure.asUnsignedFloat());
+    
+    updateParams (0);
+
+    for (auto& osc : oscillators)
+        osc.noteOn();
+
+    for (auto& a : filterADSRs)
+        a.noteOn();
+
+    for (auto& a : modADSRs)
+         a.noteOn();
+    
+    adsr.noteOn();
+}
+
 void VirtualAnalogVoice::noteStopped (bool allowTailOff)
 {
+    auto note = getCurrentlyPlayingNote();
+    DBG ("Note stopped: " + String (note.initialNote));
+
     adsr.noteOff();
 
     for (auto& a : filterADSRs)

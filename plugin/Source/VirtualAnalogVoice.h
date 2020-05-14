@@ -13,6 +13,7 @@ public:
     VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, gin::BandLimitedLookupTables& bandLimitedLookupTables);
     
     void noteStarted() override;
+    void noteRetriggered() override;
     void noteStopped (bool allowTailOff) override;
 
     void notePressureChanged() override;

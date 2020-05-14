@@ -82,13 +82,13 @@ static String freqTextFunction (const Parameter&, float v)
     return String ( int ( getMidiNoteInHertz ( v ) ) );
 }
 
-static String voiceModeTextFunction (const Parameter&, float v)
+static String glideModeTextFunction (const Parameter&, float v)
 {
     switch (int (v))
     {
-        case 0: return "mono";
-        case 1: return "legato";
-        case 2: return "poly";
+        case 0: return "Off";
+        case 1: return "Glissando";
+        case 2: return "Portamento";
         default:
             jassertfalse;
             return {};
@@ -187,12 +187,15 @@ void VirtualAnalogAudioProcessor::ADSRParams::setup (VirtualAnalogAudioProcessor
 //==============================================================================
 void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    mode    = p.addIntParam ("mode",    "Mode",     "",   "", { 0.0, 2.0, 0.0, 1.0 }, 2.0, {}, voiceModeTextFunction);
-    legato  = p.addExtParam ("legato",  "Legato",   "",   "", { 0.0, 500.0, 0.0, 1.0 }, 0.0, {});
-    level   = p.addExtParam ("level",   "Level",    "",   "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
-    voices  = p.addIntParam ("voices",  "Voices",   "",   "", { 2.0, 40.0, 1.0, 1.0 }, 40.0, {});
+    mono        = p.addIntParam ("mono",    "Mono",       "",      "",   { 0.0, 1.0, 0.0, 1.0 }, 0.0, {}, enableTextFunction);
+    glideMode   = p.addIntParam ("gMode",   "Glide Mode", "G;ide", "",   { 0.0, 2.0, 0.0, 1.0 }, 2.0, {}, glideModeTextFunction);
+    glideRate   = p.addExtParam ("gRate",   "Glide Rate", "Rate",  "",   { 0.0, 4.0, 0.0, 0.2f }, 0.0, {});
+    legato      = p.addIntParam ("legato",  "Legato",     "",      "",   { 0.0, 1.0, 0.0, 1.0 }, 0.0, {}, enableTextFunction);
+    level       = p.addExtParam ("level",   "Level",      "",      "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
+    voices      = p.addIntParam ("voices",  "Voices",     "",      "",   { 2.0, 40.0, 1.0, 1.0 }, 40.0, {});
 
-    level->conversionFunction = [] (float in) { return Decibels::decibelsToGain (in); };
+    level->conversionFunction     = [] (float in) { return Decibels::decibelsToGain (in); };
+    glideRate->conversionFunction = [] (float in) { return in / 1000.0f; };
 }
 
 //==============================================================================
@@ -410,7 +413,7 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     for (int i = 0; i < Cfg::numENVs; i++)
         modSrcEnv[i] = modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1), false);
 
-    auto firstMonoParam = globalParams.mode;
+    auto firstMonoParam = globalParams.mono;
     bool polyParam = true;
     for (auto pp : getPluginParameters())
     {
@@ -463,8 +466,12 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     
     buffer.clear();
 
-	setMono (globalParams.mode->getProcValue() == 0.0);
-    setNumVoices (globalParams.mode->getProcValue() == 0.0 ? 1 : int (globalParams.voices->getProcValue()));
+	setMono (globalParams.mono->isOn());
+    setLegato (globalParams.legato->isOn());
+    setGlissando (globalParams.glideMode->getProcValue() == 1.0f);
+    setPortamento (globalParams.glideMode->getProcValue() == 2.0f);
+    setGlideRate (globalParams.glideRate->getProcValue());
+    setNumVoices (int (globalParams.voices->getProcValue()));
     
     while (todo > 0)
     {
