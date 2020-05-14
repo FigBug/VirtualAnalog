@@ -190,7 +190,7 @@ void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcess
     mode    = p.addIntParam ("mode",    "Mode",     "",   "", { 0.0, 2.0, 0.0, 1.0 }, 2.0, {}, voiceModeTextFunction);
     legato  = p.addExtParam ("legato",  "Legato",   "",   "", { 0.0, 500.0, 0.0, 1.0 }, 0.0, {});
     level   = p.addExtParam ("level",   "Level",    "",   "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
-    voices  = p.addIntParam ("voices",  "Voices",   "",   "", { 0.0, 40.0, 1.0, 1.0 }, 40.0, {});
+    voices  = p.addIntParam ("voices",  "Voices",   "",   "", { 2.0, 40.0, 1.0, 1.0 }, 40.0, {});
 
     level->conversionFunction = [] (float in) { return Decibels::decibelsToGain (in); };
 }
@@ -462,7 +462,8 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     int todo = buffer.getNumSamples();
     
     buffer.clear();
-    
+
+	setMono (globalParams.mode->getProcValue() == 0.0);
     setNumVoices (globalParams.mode->getProcValue() == 0.0 ? 1 : int (globalParams.voices->getProcValue()));
     
     while (todo > 0)
