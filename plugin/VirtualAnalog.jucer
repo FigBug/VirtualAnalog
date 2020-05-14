@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="C56KyA" name="VirtualAnalog" projectType="audioplug" jucerVersion="5.4.7"
               companyName="SocaLabs" reportAppUsage="0" displaySplashScreen="0"
-              pluginFormats="buildAU,buildVST" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              pluginFormats="buildAU,buildStandalone,buildVST" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
               cppLanguageStandard="latest" pluginChannelConfigs="{0,2}">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
