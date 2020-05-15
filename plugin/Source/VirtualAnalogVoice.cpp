@@ -35,6 +35,7 @@ void VirtualAnalogVoice::noteStarted()
     
     updateParams (0);
     snapParams();
+    updateParams (0);
     
     for (auto& osc : oscillators)
         osc.noteOn();

@@ -214,8 +214,8 @@ public:
             addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcLFO[i], true));
             addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcMonoLFO[i], false));
 
-            addControl (cnt, new gin::Switch (lfo.sync), 0, 0);
-            addControl (cnt, new gin::Select (lfo.wave), 1, 0);
+            addControl (cnt, new gin::Select (lfo.wave), 0, 0);
+            addControl (cnt, new gin::Switch (lfo.sync), 1, 0);
             addControl (cnt, r[i] = new gin::Knob (lfo.rate), 2, 0);
             addControl (cnt, b[i] = new gin::Select (lfo.beat), 2, 0);
 
