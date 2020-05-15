@@ -18,7 +18,16 @@ void VirtualAnalogVoice::noteStarted()
     startVoice();
 
     auto note = getCurrentlyPlayingNote();
-    DBG ("Note started: " + String (note.initialNote));
+    if (glideInfo.fromNote != -1 && (glideInfo.glissando || glideInfo.portamento))
+    {
+        noteSmoother.setTime (glideInfo.rate);
+        noteSmoother.setValueUnsmoothed (glideInfo.fromNote / 127.0f);
+        noteSmoother.setValue (note.initialNote / 127.0f);
+    }
+    else
+    {
+        noteSmoother.setValueUnsmoothed (note.initialNote / 127.0f);
+    }
 
     proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
@@ -59,6 +68,16 @@ void VirtualAnalogVoice::noteRetriggered()
 {
     auto note = getCurrentlyPlayingNote();
     
+    if (glideInfo.fromNote != -1 && (glideInfo.glissando || glideInfo.portamento))
+    {
+        noteSmoother.setTime (glideInfo.rate);
+        noteSmoother.setValue (note.initialNote / 127.0f);
+    }
+    else
+    {
+        noteSmoother.setValueUnsmoothed (note.initialNote / 127.0f);
+    }
+    
     proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcPressure, note.pressure.asUnsignedFloat());
@@ -79,9 +98,6 @@ void VirtualAnalogVoice::noteRetriggered()
 
 void VirtualAnalogVoice::noteStopped (bool allowTailOff)
 {
-    auto note = getCurrentlyPlayingNote();
-    DBG ("Note stopped: " + String (note.initialNote));
-
     adsr.noteOff();
 
     for (auto& a : filterADSRs)
@@ -125,6 +141,7 @@ void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
     for (auto& l : modLFOs)
         l.setSampleRate (newRate);
 
+    noteSmoother.setSampleRate (newRate);
     adsr.setSampleRate (newRate);
 }
 
@@ -173,7 +190,9 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     {
         if (! proc.oscParams[i].enable->isOn()) continue;
         
-        currentMidiNotes[i] = float (note.initialNote + note.totalPitchbendInSemitones / 100.0);
+        currentMidiNotes[i] = noteSmoother.getCurrentValue() * 127.0f;
+        if (glideInfo.glissando) currentMidiNotes[i] = roundToInt (currentMidiNotes[i]);
+        currentMidiNotes[i] += float (note.totalPitchbendInSemitones / 100.0);
         currentMidiNotes[i] += getValue (proc.oscParams[i].tune) + getValue (proc.oscParams[i].finetune) / 100.0f;
 
         oscParams[i].wave   = (Wave) int (proc.oscParams[i].wave->getProcValue());
@@ -305,6 +324,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     adsr.setDecay (getValue (proc.adsrParams.decay));
     adsr.setSustainLevel (getValue (proc.adsrParams.sustain));
     adsr.setRelease (fastKill ? 0.01f : getValue (proc.adsrParams.release));
+    
+    noteSmoother.process (blockSize);
 }
 
 bool VirtualAnalogVoice::isVoiceActive()

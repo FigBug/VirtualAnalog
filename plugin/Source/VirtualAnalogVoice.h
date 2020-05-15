@@ -53,4 +53,6 @@ private:
 
     float currentMidiNotes[Cfg::numOSCs];
     gin::VoicedStereoOscillator::Params oscParams[Cfg::numOSCs];
+    
+    gin::EasedValueSmoother<float> noteSmoother;
 };
