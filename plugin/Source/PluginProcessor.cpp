@@ -168,8 +168,8 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
     depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { -1.0, 1.0, 0.0, 1.0 }, 1.0, {});
     phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
     offset           = p.addExtParam (id + "offset",  nm + "Offset",  "Offset", "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
-    fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "", { -60.0, 60.0, 0.0, 1.0 }, 0.1f, {});
-    delay            = p.addExtParam (id + "delay",   nm + "Delay",   "Delay",  "", { 0.0, 60.0, 0.0, 1.0 }, 0.1f, {});
+    fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "", { -60.0, 60.0, 0.0, 0.2f, true }, 0.1f, {});
+    delay            = p.addExtParam (id + "delay",   nm + "Delay",   "Delay",  "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
 }
 
 //==============================================================================
@@ -189,7 +189,7 @@ void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcess
 {
     mono        = p.addIntParam ("mono",    "Mono",       "",      "",   { 0.0, 1.0, 0.0, 1.0 }, 0.0, {}, enableTextFunction);
     glideMode   = p.addIntParam ("gMode",   "Glide Mode", "Glide", "",   { 0.0, 2.0, 0.0, 1.0 }, 2.0f, {}, glideModeTextFunction);
-    glideRate   = p.addExtParam ("gRate",   "Glide Rate", "Rate",  "",   { 0.001f, 4.0, 0.0, 0.2f }, 20.0f, {});
+    glideRate   = p.addExtParam ("gRate",   "Glide Rate", "Rate",  "",   { 0.001f, 20.0, 0.0, 0.2f }, 4.0f, {});
     legato      = p.addIntParam ("legato",  "Legato",     "",      "",   { 0.0, 1.0, 0.0, 1.0 }, 0.0, {}, enableTextFunction);
     level       = p.addExtParam ("level",   "Level",      "",      "db", { -100.0, 0.0, 1.0, 4.0f }, 0.0, {});
     voices      = p.addIntParam ("voices",  "Voices",     "",      "",   { 2.0, 40.0, 1.0, 1.0 }, 40.0f, {});
