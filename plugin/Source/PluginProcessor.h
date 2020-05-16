@@ -103,7 +103,7 @@ public:
     {
         GlobalParams() = default;
 
-        gin::Parameter::Ptr mono, glideMode, glideRate, legato, level, voices;
+        gin::Parameter::Ptr mono, glideMode, glideRate, legato, level, voices, mpe;
 
         void setup (VirtualAnalogAudioProcessor& p);
 
@@ -228,6 +228,7 @@ public:
     gin::EQ eq {4};
     Reverb reverb;
     gin::GainProcessor outputGain;
+    gin::AudioFifo fifo { 2, 44100 };
 
     //==============================================================================
     gin::ModMatrix modMatrix;

@@ -34,10 +34,15 @@ static String lfoTextFunction (const Parameter&, float v)
         case LFO::WaveShape::squarePos:     return "Square+";
         case LFO::WaveShape::sampleAndHold: return "S&H";
         case LFO::WaveShape::noise:         return "Noise";
+        case LFO::WaveShape::stepUp3:       return "Step Up 3";
         case LFO::WaveShape::stepUp4:       return "Step Up 4";
         case LFO::WaveShape::stepup8:       return "Step Up 8";
+        case LFO::WaveShape::stepDown3:     return "Step Down 3";
         case LFO::WaveShape::stepDown4:     return "Step Down 4";
         case LFO::WaveShape::stepDown8:     return "Step Down 8";
+        case LFO::WaveShape::pyramid3:      return "Pyramid 3";
+        case LFO::WaveShape::pyramid5:      return "Pyramid 5";
+        case LFO::WaveShape::pyramid9:      return "Pyramid 9";
         default:
             jassertfalse;
             return {};
@@ -104,13 +109,13 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
     enable     = p.addIntParam (id + "enable",     nm + "Enable",      "Enable",    "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1.0f : 0.0f, {});
     wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 1.0, 7.0, 1.0, 1.0 }, 1.0, {}, waveTextFunction);
     voices     = p.addIntParam (id + "unison",     nm + "Unison",      "Unison",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, {});
-    voicesTrns = p.addExtParam (id + "unisontrns", nm + "Unison Trns", "LTrans",    "", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
+    voicesTrns = p.addExtParam (id + "unisontrns", nm + "Unison Trns", "LTrans",    "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, {});
-    finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine",      "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
+    finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine",      "ct", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
     level      = p.addExtParam (id + "level",      nm + "Level",       "Level",     "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, {});
-    pulsewidth = p.addExtParam (id + "pulsewidth", nm + "Pulse Width", "PW",        "", { 1.0, 99.0, 0.0, 1.0 }, 50.0, {});
+    pulsewidth = p.addExtParam (id + "pulsewidth", nm + "Pulse Width", "PW",        "%", { 1.0, 99.0, 0.0, 1.0 }, 50.0, {});
     detune     = p.addExtParam (id + "detune",     nm + "Detune",      "Detune",    "", { 0.0, 0.5, 0.0, 1.0 }, 0.0, {});
-    spread     = p.addExtParam (id + "spread",     nm + "Spread",      "Spread",    "", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
+    spread     = p.addExtParam (id + "spread",     nm + "Spread",      "Spread",    "%", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
     pan        = p.addExtParam (id + "pan",        nm + "Pan",         "Pan",       "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
 }
 
@@ -124,15 +129,15 @@ void VirtualAnalogAudioProcessor::FilterParams::setup (VirtualAnalogAudioProcess
 
     enable           = p.addIntParam (id + "enable",  nm + "Enable",  "",      "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1.0f : 0.0f, {});
     type             = p.addIntParam (id + "type",    nm + "Type",    "Type",  "", { 0.0, 7.0, 1.0, 1.0 }, 0.0, {}, filterTextFunction);
-    keyTracking      = p.addExtParam (id + "key",     nm + "Key",     "Key",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
-    velocityTracking = p.addExtParam (id + "vel",     nm + "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
-    frequency        = p.addExtParam (id + "freq",    nm + "Freq",    "Freq",  "", { 0.0, maxFreq, 0.0, 1.0 }, 64.0, {}, freqTextFunction);
+    keyTracking      = p.addExtParam (id + "key",     nm + "Key",     "Key",   "%", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
+    velocityTracking = p.addExtParam (id + "vel",     nm + "Vel",     "Vel",   "%", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
+    frequency        = p.addExtParam (id + "freq",    nm + "Freq",    "Freq",  "Hz", { 0.0, maxFreq, 0.0, 1.0 }, 64.0, {}, freqTextFunction);
     resonance        = p.addExtParam (id + "res",     nm + "Res",     "Res",   "", { 0.0, 100.0, 0.0, 1.0 }, 0.0, {});
     amount           = p.addExtParam (id + "amount",  nm + "Amount",  "Amnt",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
-    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
-    decay            = p.addExtParam (id + "decay",   nm + "Decay",   "D",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
-    sustain          = p.addExtParam (id + "sustain", nm + "Sustain", "S",     "", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
-    release          = p.addExtParam (id + "release", nm + "Release", "R",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    decay            = p.addExtParam (id + "decay",   nm + "Decay",   "D",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    sustain          = p.addExtParam (id + "sustain", nm + "Sustain", "S",     "%", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
+    release          = p.addExtParam (id + "release", nm + "Release", "R",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
 
     sustain->conversionFunction = [] (float in) { return in / 100.0f; };
 }
@@ -144,10 +149,10 @@ void VirtualAnalogAudioProcessor::EnvParams::setup (VirtualAnalogAudioProcessor&
     String nm = "ENV" + String (idx + 1) + " ";
 
     enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, 0.0f, enableTextFunction);
-    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
-    decay            = p.addExtParam (id + "decay",   nm + "Decay",   "D",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
-    sustain          = p.addExtParam (id + "sustain", nm + "Sustain", "S",     "", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
-    release          = p.addExtParam (id + "release", nm + "Release", "R",     "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    decay            = p.addExtParam (id + "decay",   nm + "Decay",   "D",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    sustain          = p.addExtParam (id + "sustain", nm + "Sustain", "S",     "%", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
+    release          = p.addExtParam (id + "release", nm + "Release", "R",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
 
     sustain->conversionFunction = [] (float in) { return in / 100.0f; };
 }
@@ -162,24 +167,24 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
 
     enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
     sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, {}, enableTextFunction);
-    wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 12.0, 1.0, 1.0 }, 0.0, {}, lfoTextFunction);
-    rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "", { 0.0, 500.0, 0.0, 0.3f }, 10.0, {});
+    wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 0.0, 17.0, 1.0, 1.0 }, 0.0, {}, lfoTextFunction);
+    rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "Hz", { 0.0, 50.0, 0.0, 0.3f }, 10.0, {});
     beat             = p.addExtParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, {}, durationTextFunction);
     depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { -1.0, 1.0, 0.0, 1.0 }, 1.0, {});
     phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
     offset           = p.addExtParam (id + "offset",  nm + "Offset",  "Offset", "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
-    fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "", { -60.0, 60.0, 0.0, 0.2f, true }, 0.1f, {});
-    delay            = p.addExtParam (id + "delay",   nm + "Delay",   "Delay",  "", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
+    fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "s", { -60.0, 60.0, 0.0, 0.2f, true }, 0.1f, {});
+    delay            = p.addExtParam (id + "delay",   nm + "Delay",   "Delay",  "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, {});
 }
 
 //==============================================================================
 void VirtualAnalogAudioProcessor::ADSRParams::setup (VirtualAnalogAudioProcessor& p)
 {
     velocityTracking = p.addExtParam ("vel",     "Vel",     "Vel",   "", { 0.0, 100.0, 0.0, 1.0 }, 100.0, {});
-    attack           = p.addExtParam ("attack",  "Attack",  "A",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
-    decay            = p.addExtParam ("decay",   "Decay",   "D",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
-    sustain          = p.addExtParam ("sustain", "Sustain", "S",     "", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
-    release          = p.addExtParam ("release", "Release", "R",     "", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
+    attack           = p.addExtParam ("attack",  "Attack",  "A",     "s", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
+    decay            = p.addExtParam ("decay",   "Decay",   "D",     "s", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
+    sustain          = p.addExtParam ("sustain", "Sustain", "S",     "%", { 0.0, 100.0, 0.0, 1.0 }, 80.0f, {});
+    release          = p.addExtParam ("release", "Release", "R",     "s", { 0.0, 60.0, 0.0, 0.2f },  0.1f, {});
 
     sustain->conversionFunction = [] (float in) { return in / 100.0f; };
 }
@@ -189,10 +194,11 @@ void VirtualAnalogAudioProcessor::GlobalParams::setup (VirtualAnalogAudioProcess
 {
     mono        = p.addIntParam ("mono",    "Mono",       "",      "",   { 0.0, 1.0, 0.0, 1.0 }, 0.0, {}, enableTextFunction);
     glideMode   = p.addIntParam ("gMode",   "Glide Mode", "Glide", "",   { 0.0, 2.0, 0.0, 1.0 }, 2.0f, {}, glideModeTextFunction);
-    glideRate   = p.addExtParam ("gRate",   "Glide Rate", "Rate",  "",   { 0.001f, 20.0, 0.0, 0.2f }, 4.0f, {});
+    glideRate   = p.addExtParam ("gRate",   "Glide Rate", "Rate",  "s",   { 0.001f, 20.0, 0.0, 0.2f }, 4.0f, {});
     legato      = p.addIntParam ("legato",  "Legato",     "",      "",   { 0.0, 1.0, 0.0, 1.0 }, 0.0, {}, enableTextFunction);
     level       = p.addExtParam ("level",   "Level",      "",      "db", { -100.0, 0.0, 1.0, 4.0f }, 0.0, {});
     voices      = p.addIntParam ("voices",  "Voices",     "",      "",   { 2.0, 40.0, 1.0, 1.0 }, 40.0f, {});
+    mpe         = p.addIntParam ("mpe",     "MPE",        "",      "",   { 0.0, 1.0, 1.0, 1.0 }, 0.0f, {});
 
     level->conversionFunction     = [] (float in) { return Decibels::decibelsToGain (in); };
 }
@@ -232,21 +238,21 @@ void VirtualAnalogAudioProcessor::EQParams::setup (VirtualAnalogAudioProcessor& 
 
     enable   = p.addIntParam ("eqEnable",    "Enable",      "",     "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
 
-    loFreq   = p.addExtParam ("eqLoFreq",    "Lo Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d1, {}, freqTextFunction);
+    loFreq   = p.addExtParam ("eqLoFreq",    "Lo Freq",     "Freq", "Hz", { 0.0, maxFreq, 0.0, 1.0 }, d1, {}, freqTextFunction);
     loQ      = p.addExtParam ("eqLoQ",       "Lo Q",        "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
-    loGain   = p.addExtParam ("eqLoGain",    "Lo Gain",     "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+    loGain   = p.addExtParam ("eqLoGain",    "Lo Gain",     "Gain", "dB", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
-    mid1Freq = p.addExtParam ("eqM1Freq",    "Min 1 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d2, {}, freqTextFunction);
+    mid1Freq = p.addExtParam ("eqM1Freq",    "Min 1 Freq",  "Freq", "Hz", { 0.0, maxFreq, 0.0, 1.0 }, d2, {}, freqTextFunction);
     mid1Q    = p.addExtParam ("eqM1Q",       "Min 1 Q",     "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
-    mid1Gain = p.addExtParam ("eqM1Gain",    "Min 1 Gain",  "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+    mid1Gain = p.addExtParam ("eqM1Gain",    "Min 1 Gain",  "Gain", "dB", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
-    mid2Freq = p.addExtParam ("eqM2Freq",    "Mid 2 Freq",  "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d3, {}, freqTextFunction);
+    mid2Freq = p.addExtParam ("eqM2Freq",    "Mid 2 Freq",  "Freq", "Hz", { 0.0, maxFreq, 0.0, 1.0 }, d3, {}, freqTextFunction);
     mid2Q    = p.addExtParam ("eqM2Q",       "Mid 2 Q",     "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
-    mid2Gain = p.addExtParam ("eqM2Gain",    "Mid 2 Gain",  "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+    mid2Gain = p.addExtParam ("eqM2Gain",    "Mid 2 Gain",  "Gain", "dB", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
-    hiFreq   = p.addExtParam ("eqHiFreq",    "Hi Freq",     "Freq", "", { 0.0, maxFreq, 0.0, 1.0 }, d4, {}, freqTextFunction);
+    hiFreq   = p.addExtParam ("eqHiFreq",    "Hi Freq",     "Freq", "Hz", { 0.0, maxFreq, 0.0, 1.0 }, d4, {}, freqTextFunction);
     hiQ      = p.addExtParam ("eqHiQ",       "Hi Q",        "Q",    "", { 0.025f, 40.0f, 0.0, 0.2f }, 1.0f, {});
-    hiGain   = p.addExtParam ("eqHiGain",    "Hi Gain",     "Gain", "", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
+    hiGain   = p.addExtParam ("eqHiGain",    "Hi Gain",     "Gain", "dB", { -20.0f, 20.0f, 0.0, 1.0 }, 0.0f, {});
 
     loFreq->conversionFunction   = [] (float in) { return getMidiNoteInHertz (in); };
     mid1Freq->conversionFunction = [] (float in) { return getMidiNoteInHertz (in); };
@@ -267,8 +273,8 @@ void VirtualAnalogAudioProcessor::CompressorParams::setup (VirtualAnalogAudioPro
     attack    = p.addExtParam ("cpAttack",    "Attack",    "", "ms",   { 1.0f,   200.0f, 0.0f, 0.4f},    1.0f, 0.1f);
     release   = p.addExtParam ("cpRelease",   "Release",   "", "ms",   { 1.0f,  2000.0f, 0.0f, 0.4f},    5.0f, 0.1f);
     ratio     = p.addExtParam ("cpRatio",     "Ratio",     "", "",     { 1.0f,    30.0f, 0.0f, 0.4f},    5.0f, 0.1f);
-    threshold = p.addExtParam ("cpThreshold", "Threshold", "", "",     { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
-    gain      = p.addExtParam ("cpGain",      "Gain",      "", "",     { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
+    threshold = p.addExtParam ("cpThreshold", "Thresh",    "", "dB",     { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
+    gain      = p.addExtParam ("cpGain",      "Gain",      "", "dB",     { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
 
     attack->conversionFunction  = [] (float in) { return in / 1000.0f; };
     release->conversionFunction = [] (float in) { return in / 1000.0f; };
@@ -315,8 +321,8 @@ void VirtualAnalogAudioProcessor::LimiterParams::setup (VirtualAnalogAudioProces
 
     attack    = p.addExtParam ("lmAttack",    "Attack",    "", "ms",   { 1.0f,     5.0f, 0.0f, 0.4f},    1.0f, 0.1f);
     release   = p.addExtParam ("lmRelease",   "Release",   "", "ms",   { 1.0f,   100.0f, 0.0f, 0.4f},    5.0f, 0.1f);
-    threshold = p.addExtParam ("lmThreshold", "Threshold", "", "",     { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
-    gain      = p.addExtParam ("lmGain",      "Gain",      "", "",     { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
+    threshold = p.addExtParam ("lmThreshold", "Ceil",      "", "dB",   { -60.0f,   0.0f, 0.0f, 1.0f},  -30.0f, 0.1f);
+    gain      = p.addExtParam ("lmGain",      "Gain",      "", "dB",   { -30.0f,  30.0f, 0.0f, 1.0f},    0.0f, 0.1f);
 
     attack->conversionFunction  = [] (float in) { return in / 1000.0f; };
     release->conversionFunction = [] (float in) { return in / 1000.0f; };
@@ -458,6 +464,9 @@ void VirtualAnalogAudioProcessor::releaseResources()
 void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
     ScopedNoDenormals noDenormals;
+    
+    setMPE (globalParams.mpe->isOn());
+    
     playhead = getPlayHead();
     
     int pos = 0;
@@ -490,6 +499,8 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     }
 
     playHead = nullptr;
+    
+    fifo.write (buffer);
 }
 
 Array<float> VirtualAnalogAudioProcessor::getLiveFilterCutoff (int i)

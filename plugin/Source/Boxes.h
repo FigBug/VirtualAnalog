@@ -349,6 +349,14 @@ public:
         addControl (idx, new gin::Knob (proc.limiterParams.threshold), 0, 1);
         addControl (idx, new gin::Knob (proc.limiterParams.gain), 1, 1);
         idx++;
+        
+        addPage ("Scope", 6, 2);
+        auto scope = new gin::TriggeredScope (proc.fifo);
+        scope->setNumChannels (2);
+        scope->setTriggerMode (gin::TriggeredScope::TriggerMode::Up);
+        scope->setColour (gin::TriggeredScope::lineColourId, Colours::transparentBlack);
+        addControl (idx, scope, 0, 0, 6, 2);
+        idx++;
     }
 
     void paramChanged () override

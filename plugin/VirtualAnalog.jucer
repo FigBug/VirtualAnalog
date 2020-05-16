@@ -4,7 +4,7 @@
               companyName="SocaLabs" reportAppUsage="0" displaySplashScreen="0"
               pluginFormats="buildAU,buildStandalone,buildVST" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
-              cppLanguageStandard="latest" pluginChannelConfigs="{0,2}">
+              cppLanguageStandard="latest" pluginChannelConfigs="{0,2}" version="0.01">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
       <FILE id="Ma3e0n" name="Cfg.h" compile="0" resource="0" file="Source/Cfg.h"/>
