@@ -123,7 +123,7 @@ public:
             addControl (i, new gin::Knob (flt.resonance), 2, 0);
 
             addControl (i, new gin::Knob (flt.keyTracking), 0, 1);
-            addControl (i, new gin::Knob (flt.amount), 1, 1);
+            addControl (i, new gin::Knob (flt.amount, true), 1, 1);
             addControl (i, v[i] = new gin::Knob (flt.velocityTracking), 2, 1);
 
             adsr[i] = new gin::ADSRComponent ();
