@@ -117,6 +117,8 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
     detune     = p.addExtParam (id + "detune",     nm + "Detune",      "Detune",    "", { 0.0, 0.5, 0.0, 1.0 }, 0.0, {});
     spread     = p.addExtParam (id + "spread",     nm + "Spread",      "Spread",    "%", { -100.0, 100.0, 0.0, 1.0 }, 0.0, {});
     pan        = p.addExtParam (id + "pan",        nm + "Pan",         "Pan",       "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, {});
+    
+    level->conversionFunction = [] (float in)   { return Decibels::decibelsToGain (in); };
 }
 
 //==============================================================================

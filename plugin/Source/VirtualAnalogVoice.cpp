@@ -204,7 +204,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         oscParams[i].pan    = getValue (proc.oscParams[i].pan);
         oscParams[i].spread = getValue (proc.oscParams[i].spread) / 100.0f;
         oscParams[i].detune = getValue (proc.oscParams[i].detune);
-        oscParams[i].gain   = Decibels::decibelsToGain (getValue (proc.oscParams[i].level));
+        oscParams[i].gain   = getValue (proc.oscParams[i].level);
     }
 
     for (int i = 0; i < Cfg::numFilters; i++)
