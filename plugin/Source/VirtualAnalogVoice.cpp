@@ -36,6 +36,7 @@ void VirtualAnalogVoice::noteStarted()
     updateParams (0);
     snapParams();
     updateParams (0);
+    snapParams();
     
     for (auto& osc : oscillators)
         osc.noteOn();
@@ -208,7 +209,11 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
     for (int i = 0; i < Cfg::numFilters; i++)
     {
-        if (! proc.filterParams[i].enable->isOn()) continue;
+        if (! proc.filterParams[i].enable->isOn())
+        {
+            proc.modMatrix.setPolyValue (*this, proc.modSrcFilter[i], 0);
+            continue;
+        }
         
         filterADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
         filterADSRs[i].setSustainLevel (getValue (proc.filterParams[i].sustain));
@@ -273,12 +278,12 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
     for (int i = 0; i < Cfg::numENVs; i++)
     {
-        if (proc.filterParams[i].enable->isOn())
+        if (proc.envParams[i].enable->isOn())
         {
-            modADSRs[i].setAttack (getValue (proc.filterParams[i].attack));
-            modADSRs[i].setSustainLevel (getValue (proc.filterParams[i].attack));
-            modADSRs[i].setDecay (getValue (proc.filterParams[i].attack));
-            modADSRs[i].setRelease (getValue (proc.filterParams[i].attack));
+            modADSRs[i].setAttack (getValue (proc.envParams[i].attack));
+            modADSRs[i].setSustainLevel (getValue (proc.envParams[i].sustain));
+            modADSRs[i].setDecay (getValue (proc.envParams[i].decay));
+            modADSRs[i].setRelease (getValue (proc.envParams[i].release));
 
             proc.modMatrix.setPolyValue (*this, proc.modSrcEnv[i], modADSRs[i].getOutput());
 
