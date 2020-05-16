@@ -5,7 +5,7 @@
 #include "VirtualAnalogVoice.h"
 
 //==============================================================================
-class VirtualAnalogAudioProcessor : public gin::GinProcessor,
+class VirtualAnalogAudioProcessor : public gin::Processor,
                                     public gin::Synthesiser
 {
 public:

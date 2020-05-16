@@ -5,7 +5,7 @@ using namespace gin;
 
 //==============================================================================
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
-    : GinAudioProcessorEditor (p, 50, 50 + 15), proc (p)
+    : ProcessorEditor (p, 50, 50 + 15), proc (p)
 {
     oscHeaders.addChildComponent (modOverview);
 
@@ -31,7 +31,7 @@ VirtualAnalogAudioProcessorEditor::~VirtualAnalogAudioProcessorEditor()
 //==============================================================================
 void VirtualAnalogAudioProcessorEditor::paint (Graphics& g)
 {
-    GinAudioProcessorEditor::paint (g);
+    ProcessorEditor::paint (g);
 
     g.setColour (Colours::white.withAlpha (0.2f));
 
@@ -41,7 +41,7 @@ void VirtualAnalogAudioProcessorEditor::paint (Graphics& g)
 
 void VirtualAnalogAudioProcessorEditor::resized()
 {
-    GinAudioProcessorEditor::resized ();
+    ProcessorEditor::resized ();
 
     auto rc = getFullGridArea();
 

@@ -8,7 +8,7 @@
 class CommonBox : public gin::PagedControlBox
 {
 public:
-    CommonBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+    CommonBox (gin::ProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
         : gin::PagedControlBox (e), proc (proc_)
     {
         auto& g = proc.globalParams;
@@ -49,7 +49,7 @@ public:
 class OscillatorBox : public gin::PagedControlBox
 {
 public:
-    OscillatorBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+    OscillatorBox (gin::ProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
         : gin::PagedControlBox (e), proc (proc_)
     {
         for ( int i = 0; i < numElementsInArray (proc.oscParams); i++)
@@ -106,7 +106,7 @@ public:
 class FilterBox : public gin::PagedControlBox
 {
 public:
-    FilterBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+    FilterBox (gin::ProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
         : gin::PagedControlBox (e), proc (proc_)
     {
         for (int i = 0; i < numElementsInArray (proc.filterParams); i++)
@@ -173,7 +173,7 @@ public:
 class ADSRBox : public gin::ControlBox
 {
 public:
-    ADSRBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
+    ADSRBox (gin::ProcessorEditor& e, VirtualAnalogAudioProcessor& proc)
         : gin::ControlBox (e)
     {
         auto& env = proc.adsrParams;
@@ -210,7 +210,7 @@ public:
 class ModulationBox : public gin::PagedControlBox
 {
 public:
-    ModulationBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+    ModulationBox (gin::ProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
         : gin::PagedControlBox (e), proc (proc_)
     {
         int cnt = 0;
@@ -283,7 +283,7 @@ public:
 class EffectsBox : public gin::PagedControlBox
 {
 public:
-    EffectsBox (gin::GinAudioProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
+    EffectsBox (gin::ProcessorEditor& e, VirtualAnalogAudioProcessor& proc_)
         : gin::PagedControlBox (e), proc (proc_)
     {
         int idx = 0;

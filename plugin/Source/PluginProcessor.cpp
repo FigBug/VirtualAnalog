@@ -438,7 +438,7 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
 
 void VirtualAnalogAudioProcessor::prepareToPlay (double newSampleRate, int newSamplesPerBlock)
 {
-    GinProcessor::prepareToPlay (newSampleRate, newSamplesPerBlock);
+    Processor::prepareToPlay (newSampleRate, newSamplesPerBlock);
     
     bandLimitedLookupTables.setSampleRate (newSampleRate);
     setCurrentPlaybackSampleRate (newSampleRate);

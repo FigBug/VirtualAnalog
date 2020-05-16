@@ -5,7 +5,7 @@
 #include "Boxes.h"
 
 //==============================================================================
-class VirtualAnalogAudioProcessorEditor : public gin::GinAudioProcessorEditor
+class VirtualAnalogAudioProcessorEditor : public gin::ProcessorEditor
 {
 public:
     VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor&);
