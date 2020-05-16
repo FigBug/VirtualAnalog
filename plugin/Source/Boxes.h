@@ -25,6 +25,10 @@ public:
         
         watchParam (g.mono);
         watchParam (g.glideMode);
+        
+        addPage ("Control", 1, 2);
+
+        addControl (1, new gin::Switch (g.mpe), 0, 0);
     }
     
     void paramChanged() override
@@ -72,6 +76,11 @@ public:
 
             watchParam (osc.voices);
         }
+        
+        setPageOpen (0, true);
+        setPageOpen (2, true);
+        setPageOpen (4, true);
+        setPageOpen (6, true);
     }
 
     void paramChanged() override
