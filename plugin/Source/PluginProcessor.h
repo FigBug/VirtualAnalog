@@ -75,7 +75,7 @@ public:
 
         JUCE_DECLARE_NON_COPYABLE (EnvParams)
     };
-    
+
     struct LFOParams
     {
         LFOParams() = default;
@@ -195,7 +195,7 @@ public:
     int modSrcPressure = 0, modSrcTimbre = 0, modScrPitchBend = 0,
         modSrcNote = 0, modSrcVelocity = 0;
 
-    int modSrcCC[119]                    = {0};
+    int modSrcCC[120]                    = {0};
     int modSrcMonoLFO[Cfg::numLFOs]      = {0};
     int modSrcLFO[Cfg::numLFOs]          = {0};
     int modSrcFilter[Cfg::numFilters]    = {0};
