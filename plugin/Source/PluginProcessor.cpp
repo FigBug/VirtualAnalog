@@ -84,7 +84,7 @@ static String filterTextFunction (const Parameter&, float v)
 
 static String freqTextFunction (const Parameter&, float v)
 {
-    return String ( int ( getMidiNoteInHertz ( v ) ) );
+    return String (int (getMidiNoteInHertz (v)));
 }
 
 static String glideModeTextFunction (const Parameter&, float v)
