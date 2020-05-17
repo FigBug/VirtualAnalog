@@ -55,4 +55,6 @@ private:
     gin::VoicedStereoOscillator::Params oscParams[Cfg::numOSCs];
     
     gin::EasedValueSmoother<float> noteSmoother;
+    
+    float ampKeyTrack = 1.0f;
 };

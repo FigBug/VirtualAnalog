@@ -159,7 +159,8 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
             oscillators[i].processAdding (currentMidiNotes[i], oscParams[i], buffer);
 
     // Apply velocity
-    buffer.applyGain (velocityToGain (currentlyPlayingNote.noteOnVelocity.asUnsignedFloat()));
+    float velocity = currentlyPlayingNote.noteOnVelocity.asUnsignedFloat();
+    buffer.applyGain (velocityToGain (velocity, ampKeyTrack));
 
     // Apply filters
     for (int i = 0; i < numElementsInArray (filters); i++)
@@ -206,6 +207,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         oscParams[i].detune = getValue (proc.oscParams[i].detune);
         oscParams[i].gain   = getValue (proc.oscParams[i].level);
     }
+    
+    ampKeyTrack = getValue (proc.adsrParams.velocityTracking);
 
     for (int i = 0; i < Cfg::numFilters; i++)
     {
@@ -222,10 +225,12 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
         float filterWidth = float (getMidiNoteFromHertz (20000.0));
         float filterEnv   = filterADSRs[i].getOutput();
+        float filterSens = getValue (proc.filterParams[i].velocityTracking);
+        filterSens = currentlyPlayingNote.noteOnVelocity.asUnsignedFloat() * filterSens + 1.0f - filterSens;
 
         float n = getValue (proc.filterParams[i].frequency);
-        n += (currentlyPlayingNote.initialNote - 60) * getValue (proc.filterParams[i].keyTracking) / 100.0f;
-        n += filterEnv * (getValue (proc.filterParams[i].amount) * filterWidth);
+        n += (currentlyPlayingNote.initialNote - 60) * getValue (proc.filterParams[i].keyTracking);
+        n += filterEnv * filterSens * getValue (proc.filterParams[i].amount) * filterWidth;
 
         float f = getMidiNoteInHertz (n);
         float maxFreq = std::min (20000.0f, float (getSampleRate() / 2));
