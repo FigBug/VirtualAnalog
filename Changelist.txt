@@ -1,6 +1,9 @@
 0.0.3:
 - Fixed amp velocity track
 - Fixed filter velocity track
+- Added patch browser
+- Added patch name and tags
+- Fixed square/pulse oscillator
 
 0.0.2:
 - Fixed pitch bend
