@@ -195,11 +195,7 @@ public:
     int modSrcPressure = 0, modSrcTimbre = 0, modScrPitchBend = 0,
         modSrcNote = 0, modSrcVelocity = 0;
 
-    int modSrcCC[120]                    = {0};
-    int modSrcMonoLFO[Cfg::numLFOs]      = {0};
-    int modSrcLFO[Cfg::numLFOs]          = {0};
-    int modSrcFilter[Cfg::numFilters]    = {0};
-    int modSrcEnv[Cfg::numENVs]          = {0};
+    Array<int> modSrcCC, modSrcMonoLFO, modSrcLFO, modSrcFilter, modSrcEnv;
 
     //==============================================================================
 

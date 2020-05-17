@@ -403,22 +403,22 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
 	{
 		String name = MidiMessage::getControllerName (i);
 		if (name.isEmpty())
-			modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("CC %d", i), false);
+            modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("CC %d", i), false));
 		else
-			modSrcCC[i] = modMatrix.addMonoModSource (String::formatted ("CC %d ", i) + name, false);
+			modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("CC %d ", i) + name, false));
 	}
 
     for (int i = 0; i < Cfg::numLFOs; i++)
-        modSrcMonoLFO[i] = modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1), true);
+        modSrcMonoLFO.add (modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1), true));
 
     for (int i = 0; i < Cfg::numLFOs; i++)
-        modSrcLFO[i] = modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1), true);
+        modSrcLFO.add (modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1), true));
 
     for (int i = 0; i < Cfg::numFilters; i++)
-        modSrcFilter[i] = modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1), false);
+        modSrcFilter.add (modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1), false));
 
     for (int i = 0; i < Cfg::numENVs; i++)
-        modSrcEnv[i] = modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1), false);
+        modSrcEnv.add (modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1), false));
 
     auto firstMonoParam = globalParams.mono;
     bool polyParam = true;
