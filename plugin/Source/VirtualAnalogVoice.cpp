@@ -346,9 +346,9 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         int n = int (proc.stepLfoParams.length->getProcValue());
         modStepLFO.setNumPoints (n);
         for (int i = n; --i >= 0;)
-            proc.modStepLFO.setPoint (i, proc.stepLfoParams.level[i]->getProcValue());
+            modStepLFO.setPoint (i, proc.stepLfoParams.level[i]->getProcValue());
         
-        proc.modStepLFO.process (blockSize);
+        modStepLFO.process (blockSize);
 
         proc.modMatrix.setPolyValue (*this, proc.modSrcStep, modStepLFO.getOutput());
     }

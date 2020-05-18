@@ -266,7 +266,7 @@ public:
         addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcMonoStep, false));
 
         addControl (cnt, new gin::Select (stp.beat), 0, 0);
-        addControl (cnt, new gin::Knob (stp.length, true), 0, 1);
+        addControl (cnt, new gin::Knob (stp.length), 0, 1);
         
         auto s = new gin::StepLFOComponent();
         s->setParams (stp.beat, stp.length, stp.level, stp.enable);
