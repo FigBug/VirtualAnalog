@@ -261,6 +261,11 @@ public:
 
 		addPage ("All", 6, 2);
 		addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 6, 2);
+        cnt++;
+
+        addPage ("Mod Matrix", 5, 2);
+        addControl (cnt, new gin::ModMatrixBox (proc, proc.modMatrix), 0, 0, 5, 2);
+        cnt++;
     }
 
     void paramChanged () override
