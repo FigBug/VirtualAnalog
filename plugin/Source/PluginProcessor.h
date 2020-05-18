@@ -87,6 +87,18 @@ public:
         JUCE_DECLARE_NON_COPYABLE (LFOParams)
     };
 
+    struct StepLFOParams
+    {
+        StepLFOParams() = default;
+
+        gin::Parameter::Ptr enable, beat, length;
+        gin::Parameter::Ptr level[32] = { nullptr };
+
+        void setup (VirtualAnalogAudioProcessor& p);
+
+        JUCE_DECLARE_NON_COPYABLE (StepLFOParams)
+    };
+    
     struct ADSRParams
     {
         ADSRParams() = default;
@@ -193,7 +205,7 @@ public:
 
     //==============================================================================
     int modSrcPressure = 0, modSrcTimbre = 0, modScrPitchBend = 0,
-        modSrcNote = 0, modSrcVelocity = 0;
+        modSrcNote = 0, modSrcVelocity = 0, modSrcStep = 0, modSrcMonoStep = 0;
 
     Array<int> modSrcCC, modSrcMonoLFO, modSrcLFO, modSrcFilter, modSrcEnv;
 
@@ -203,6 +215,7 @@ public:
     FilterParams filterParams[Cfg::numFilters];
     EnvParams envParams[Cfg::numENVs];
     LFOParams lfoParams[Cfg::numLFOs];
+    StepLFOParams stepLfoParams;
 
     ADSRParams adsrParams;
 
@@ -230,6 +243,7 @@ public:
     gin::ModMatrix modMatrix;
 
     gin::LFO modLFOs[Cfg::numLFOs];
+    gin::StepLFO modStepLFO;
 
     AudioPlayHead* playhead = nullptr;
 

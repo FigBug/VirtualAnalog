@@ -259,6 +259,20 @@ public:
             addControl (cnt, adsr, 2, 0, 3, 2);
         }
 
+        auto& stp = proc.stepLfoParams;
+        addPage ("Step", 6, 2);
+        addPageEnable (cnt, stp.enable);
+        addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcStep, true));
+        addBottomButton (cnt, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcMonoStep, false));
+
+        addControl (cnt, new gin::Select (stp.beat), 0, 0);
+        addControl (cnt, new gin::Knob (stp.length, true), 0, 1);
+        
+        auto s = new gin::StepLFOComponent();
+        s->setParams (stp.beat, stp.length, stp.level, stp.enable);
+        addControl (cnt, s, 1, 0, 5, 2);
+        cnt++;
+        
 		addPage ("All", 6, 2);
 		addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 6, 2);
         cnt++;

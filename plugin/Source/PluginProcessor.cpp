@@ -173,12 +173,31 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
     sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, 0.0f, enableTextFunction);
     wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 1.0, 17.0, 1.0, 1.0 }, 1.0, 0.0f, lfoTextFunction);
     rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "Hz", { 0.0, 50.0, 0.0, 0.3f }, 10.0, 0.0f);
-    beat             = p.addExtParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, 0.0f, durationTextFunction);
+    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, 0.0f, durationTextFunction);
     depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { -1.0, 1.0, 0.0, 1.0 }, 1.0, 0.0f);
     phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, 0.0f);
     offset           = p.addExtParam (id + "offset",  nm + "Offset",  "Offset", "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, 0.0f);
     fade             = p.addExtParam (id + "fade",    nm + "Fade",    "Fade",   "s", { -60.0, 60.0, 0.0, 0.2f, true }, 0.1f, 0.0f);
     delay            = p.addExtParam (id + "delay",   nm + "Delay",   "Delay",  "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, 0.0f);
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::StepLFOParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    String id = "slfo";
+    String nm = "Step LFO";
+    
+    auto notes = NoteDuration::getNoteDurations();
+
+    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
+    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, 0.0f, durationTextFunction);
+    length           = p.addIntParam (id + "length",  nm + "Length",   "Length", "", { 2.0, 32.0, 1.0, 1.0f }, 8.0f, 0.0f);
+    
+    for (int i = 0; i < 32; i++)
+    {
+        auto num = String (i + 1);
+        level[i]     = p.addIntParam (id + "length" + num,  nm + "Length " + num, "", "", { -1.0, 1.0, 0.0, 1.0f }, 0.0f, 0.0f);
+    }
 }
 
 //==============================================================================
@@ -351,9 +370,11 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 
     for (int i = 0; i < numElementsInArray (lfoParams); i++)
         lfoParams[i].setup (*this, i);
+    
+    stepLfoParams.setup (*this);
+    adsrParams.setup (*this);
 
     globalParams.setup (*this);
-    adsrParams.setup (*this);
     chorusParams.setup (*this);
     distortionParams.setup (*this);
     eqParams.setup (*this);
@@ -416,6 +437,9 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
 
     for (int i = 0; i < Cfg::numLFOs; i++)
         modSrcLFO.add (modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1), true));
+    
+    modSrcMonoStep = modMatrix.addMonoModSource ("Step LFO (Mono)", true);
+    modSrcStep     = modMatrix.addPolyModSource ("Step LFO", true);
 
     for (int i = 0; i < Cfg::numFilters; i++)
         modSrcFilter.add (modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1), false));
@@ -460,6 +484,8 @@ void VirtualAnalogAudioProcessor::prepareToPlay (double newSampleRate, int newSa
 
     for (auto& l : modLFOs)
         l.setSampleRate (newSampleRate);
+    
+    modStepLFO.setSampleRate (newSampleRate);
 }
 
 void VirtualAnalogAudioProcessor::releaseResources()
@@ -589,6 +615,27 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
         {
             modMatrix.setMonoValue (modSrcMonoLFO[i], 0);
         }
+    }
+    
+    // Update Mono Step LFO
+    if (stepLfoParams.enable->isOn())
+    {
+        float freq = 1.0f / NoteDuration::getNoteDurations()[size_t (stepLfoParams.beat->getProcValue())].toSeconds (playhead);
+
+        modStepLFO.setFreq (freq);
+        
+        int n = int (stepLfoParams.length->getProcValue());
+        modStepLFO.setNumPoints (n);
+        for (int i = n; --i >= 0;)
+            modStepLFO.setPoint (i, stepLfoParams.level[i]->getProcValue());
+        
+        modStepLFO.process (newBlockSize);
+
+        modMatrix.setMonoValue (modSrcMonoStep, modStepLFO.getOutput());
+    }
+    else
+    {
+        modMatrix.setMonoValue (modSrcMonoStep, 0);
     }
 
     // Update Chorus

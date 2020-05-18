@@ -61,6 +61,9 @@ void VirtualAnalogVoice::noteStarted()
         l.reset();
         l.noteOn();
     }
+    
+    modStepLFO.reset();
+    modStepLFO.noteOn();
 
     adsr.reset();
     adsr.noteOn();
@@ -95,6 +98,7 @@ void VirtualAnalogVoice::noteRetriggered()
     for (auto& a : modADSRs)
          a.noteOn();
     
+    modStepLFO.noteOn();
     adsr.noteOn();
 }
 
@@ -143,6 +147,7 @@ void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
     for (auto& l : modLFOs)
         l.setSampleRate (newRate);
 
+    modStepLFO.setSampleRate (newRate);
     noteSmoother.setSampleRate (newRate);
     adsr.setSampleRate (newRate);
 }
@@ -329,6 +334,27 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         {
             proc.modMatrix.setPolyValue (*this, proc.modSrcLFO[i], 0);
         }
+    }
+    
+    // Update Step LFO
+    if (proc.stepLfoParams.enable->isOn())
+    {
+        float freq = 1.0f / NoteDuration::getNoteDurations()[size_t (proc.stepLfoParams.beat->getProcValue())].toSeconds (proc.playhead);
+
+        modStepLFO.setFreq (freq);
+        
+        int n = int (proc.stepLfoParams.length->getProcValue());
+        modStepLFO.setNumPoints (n);
+        for (int i = n; --i >= 0;)
+            proc.modStepLFO.setPoint (i, proc.stepLfoParams.level[i]->getProcValue());
+        
+        proc.modStepLFO.process (blockSize);
+
+        proc.modMatrix.setPolyValue (*this, proc.modSrcStep, modStepLFO.getOutput());
+    }
+    else
+    {
+        proc.modMatrix.setPolyValue (*this, proc.modSrcStep, 0);
     }
 
     adsr.setAttack (getValue (proc.adsrParams.attack));

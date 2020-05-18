@@ -48,6 +48,7 @@ private:
     
     gin::ADSR modADSRs[Cfg::numENVs];
     gin::LFO modLFOs[Cfg::numLFOs];
+    gin::StepLFO modStepLFO;
 
     gin::AnalogADSR adsr;
 
