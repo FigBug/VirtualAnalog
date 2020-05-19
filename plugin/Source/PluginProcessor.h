@@ -204,10 +204,10 @@ public:
     };
 
     //==============================================================================
-    int modSrcPressure = 0, modSrcTimbre = 0, modScrPitchBend = 0,
-        modSrcNote = 0, modSrcVelocity = 0, modSrcStep = 0, modSrcMonoStep = 0;
+    gin::ModSrcId modSrcPressure, modSrcTimbre, modScrPitchBend,
+                  modSrcNote, modSrcVelocity, modSrcStep, modSrcMonoStep;
 
-    Array<int> modSrcCC, modSrcMonoLFO, modSrcLFO, modSrcFilter, modSrcEnv;
+    Array<gin::ModSrcId> modSrcCC, modSrcMonoLFO, modSrcLFO, modSrcFilter, modSrcEnv;
 
     //==============================================================================
 

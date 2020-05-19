@@ -415,37 +415,37 @@ void VirtualAnalogAudioProcessor::updateState()
 //==============================================================================
 void VirtualAnalogAudioProcessor::setupModMatrix()
 {
-    modSrcPressure  = modMatrix.addPolyModSource ("MPE Pressure", false);
-    modSrcTimbre    = modMatrix.addPolyModSource ("MPE Timbre", false);
+    modSrcPressure  = modMatrix.addPolyModSource ("mpep", "MPE Pressure", false);
+    modSrcTimbre    = modMatrix.addPolyModSource ("mpet", "MPE Timbre", false);
 
-    modScrPitchBend = modMatrix.addMonoModSource ("Pitch Bend", true);
+    modScrPitchBend = modMatrix.addMonoModSource ("pb", "Pitch Bend", true);
 
-    modSrcNote      = modMatrix.addPolyModSource ("MIDI Note Number", false);
-    modSrcVelocity  = modMatrix.addPolyModSource ("MIDI Velocity", false);
+    modSrcNote      = modMatrix.addPolyModSource ("note", "MIDI Note Number", false);
+    modSrcVelocity  = modMatrix.addPolyModSource ("vel", "MIDI Velocity", false);
 
     for (int i = 0; i <= 119; i++)
 	{
 		String name = MidiMessage::getControllerName (i);
 		if (name.isEmpty())
-            modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("CC %d", i), false));
+            modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("cc%d", i), String::formatted ("CC %d", i), false));
 		else
-			modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("CC %d ", i) + name, false));
+			modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("cc%d", i), String::formatted ("CC %d ", i) + name, false));
 	}
 
     for (int i = 0; i < Cfg::numLFOs; i++)
-        modSrcMonoLFO.add (modMatrix.addMonoModSource (String::formatted ("LFO %d (Mono)", i + 1), true));
+        modSrcMonoLFO.add (modMatrix.addMonoModSource (String::formatted ("mlfo%d", i + 1), String::formatted ("LFO %d (Mono)", i + 1), true));
 
     for (int i = 0; i < Cfg::numLFOs; i++)
-        modSrcLFO.add (modMatrix.addPolyModSource (String::formatted ("LFO %d", i + 1), true));
+        modSrcLFO.add (modMatrix.addPolyModSource (String::formatted ("lfo%d", i + 1), String::formatted ("LFO %d", i + 1), true));
     
-    modSrcMonoStep = modMatrix.addMonoModSource ("Step LFO (Mono)", true);
-    modSrcStep     = modMatrix.addPolyModSource ("Step LFO", true);
+    modSrcMonoStep = modMatrix.addMonoModSource ("mstep", "Step LFO (Mono)", true);
+    modSrcStep     = modMatrix.addPolyModSource ("step", "Step LFO", true);
 
     for (int i = 0; i < Cfg::numFilters; i++)
-        modSrcFilter.add (modMatrix.addPolyModSource (String::formatted ("Filter Envelope %d", i + 1), false));
+        modSrcFilter.add (modMatrix.addPolyModSource (String::formatted ("fenv%d", i + 1), String::formatted ("Filter Envelope %d", i + 1), false));
 
     for (int i = 0; i < Cfg::numENVs; i++)
-        modSrcEnv.add (modMatrix.addPolyModSource (String::formatted ("Envelope %d", i + 1), false));
+        modSrcEnv.add (modMatrix.addPolyModSource (String::formatted ("env%d", i + 1), String::formatted ("Envelope %d", i + 1), false));
 
     auto firstMonoParam = globalParams.mono;
     bool polyParam = true;

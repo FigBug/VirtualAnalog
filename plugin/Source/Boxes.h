@@ -141,7 +141,7 @@ public:
             {
                 if (proc.filterParams[i].amount->getUserValue()      != 0.0f ||
                     proc.filterParams[i].keyTracking->getUserValue() != 0.0f ||
-					proc.modMatrix.isModulated (proc.filterParams[i].frequency->getModIndex()))
+					proc.modMatrix.isModulated (gin::ModDstId (proc.filterParams[i].frequency->getModIndex())))
                     return proc.getLiveFilterCutoff (i);
                 return Array<float>();
             });
