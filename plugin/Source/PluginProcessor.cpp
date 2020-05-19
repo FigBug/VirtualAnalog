@@ -495,7 +495,8 @@ void VirtualAnalogAudioProcessor::releaseResources()
 void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
     ScopedNoDenormals noDenormals;
-    
+
+	startBlock();
     setMPE (globalParams.mpe->isOn());
     
     playhead = getPlayHead();
@@ -532,6 +533,7 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
     playHead = nullptr;
     
     fifo.write (buffer);
+	endBlock (buffer.getNumSamples());
 }
 
 Array<float> VirtualAnalogAudioProcessor::getLiveFilterCutoff (int i)

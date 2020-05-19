@@ -273,8 +273,8 @@ public:
         addControl (cnt, s, 1, 0, 5, 2);
         cnt++;
         
-		addPage ("All", 6, 2);
-		addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 6, 2);
+		addPage ("All", 5, 2);
+		addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 5, 2);
         cnt++;
 
         addPage ("Mod Matrix", 5, 2);

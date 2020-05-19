@@ -40,5 +40,7 @@ private:
     gin::ControlHeader effectsHeader { "Effects" };
     EffectsBox effects { *this, proc };
 
+	gin::SynthesiserUsage usage { proc };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessorEditor)
 };
