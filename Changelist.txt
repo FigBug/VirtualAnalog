@@ -9,6 +9,7 @@
 - Refactored mod matrix load / save (Sorry, I broke your patches)
 - Added step lfo
 - Added mod matrix overview
+- Fixed levels of unison oscillators
 
 0.0.2:
 - Fixed pitch bend

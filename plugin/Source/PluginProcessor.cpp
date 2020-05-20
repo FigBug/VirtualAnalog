@@ -330,7 +330,7 @@ void VirtualAnalogAudioProcessor::CompressorParams::setup (VirtualAnalogAudioPro
 //==============================================================================
 void VirtualAnalogAudioProcessor::DelayParams::setup (VirtualAnalogAudioProcessor& p)
 {
-    enable = p.addIntParam ("rvEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
+    enable = p.addIntParam ("dlEnable",    "Enable",     "",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
 
     float mxd = float (NoteDuration::getNoteDurations().size()) - 1.0f;
 
