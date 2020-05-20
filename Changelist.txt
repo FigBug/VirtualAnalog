@@ -11,6 +11,7 @@
 - Added mod matrix overview
 - Fixed levels of unison oscillators
 - Fixed delay saving enable state
+- Fixed filter with 0 attack not starting at max cutoff
 
 0.0.2:
 - Fixed pitch bend

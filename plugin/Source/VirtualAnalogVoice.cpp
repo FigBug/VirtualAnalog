@@ -32,7 +32,21 @@ void VirtualAnalogVoice::noteStarted()
     proc.modMatrix.setPolyValue (*this, proc.modSrcVelocity, note.noteOnVelocity.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcPressure, note.pressure.asUnsignedFloat());
-    
+
+    ScopedValueSetter<bool> svs (disableSmoothing, true);
+
+    for (auto& f : filters)
+        f.reset();
+
+    for (auto& a : filterADSRs)
+        a.reset();
+
+    for (auto& a : modADSRs)
+         a.noteOn();
+
+    for (auto& l : modLFOs)
+        l.reset();
+
     updateParams (0);
     snapParams();
     updateParams (0);
@@ -41,27 +55,15 @@ void VirtualAnalogVoice::noteStarted()
     for (auto& osc : oscillators)
         osc.noteOn();
 
-    for (auto& f : filters)
-        f.reset();
-
     for (auto& a : filterADSRs)
-    {
-        a.reset();
         a.noteOn();
-    }
 
     for (auto& a : modADSRs)
-    {
-         a.reset();
          a.noteOn();
-    }
-    
+
     for (auto& l : modLFOs)
-    {
-        l.reset();
         l.noteOn();
-    }
-    
+
     modStepLFO.reset();
     modStepLFO.noteOn();
 
@@ -228,6 +230,8 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         filterADSRs[i].setDecay (getValue (proc.filterParams[i].decay));
         filterADSRs[i].setRelease (getValue (proc.filterParams[i].release));
 
+        filterADSRs[i].process (blockSize);
+
         float filterWidth = float (getMidiNoteFromHertz (20000.0));
         float filterEnv   = filterADSRs[i].getOutput();
         float filterSens = getValue (proc.filterParams[i].velocityTracking);
@@ -282,8 +286,6 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         filters[i].setParams (f, q);
 
         proc.modMatrix.setPolyValue (*this, proc.modSrcFilter[i], filterADSRs[i].getOutput());
-        
-        filterADSRs[i].process (blockSize);
     }
 
     for (int i = 0; i < Cfg::numENVs; i++)
