@@ -10,6 +10,7 @@
 - Added step lfo
 - Added mod matrix overview
 - Fixed levels of unison oscillators
+- Fixed delay saving enable state
 
 0.0.2:
 - Fixed pitch bend
