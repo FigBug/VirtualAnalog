@@ -117,7 +117,7 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
     detune     = p.addExtParam (id + "detune",     nm + "Detune",      "Detune",    "", { 0.0, 0.5, 0.0, 1.0 }, 0.0, 0.0f);
     spread     = p.addExtParam (id + "spread",     nm + "Spread",      "Spread",    "%", { -100.0, 100.0, 0.0, 1.0 }, 0.0, 0.0f);
     pan        = p.addExtParam (id + "pan",        nm + "Pan",         "Pan",       "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, 0.0f);
-    
+
     level->conversionFunction = [] (float in)   { return Decibels::decibelsToGain (in); };
 }
 
@@ -166,14 +166,14 @@ void VirtualAnalogAudioProcessor::LFOParams::setup (VirtualAnalogAudioProcessor&
 {
     String id = "lfo" + String (idx + 1);
     String nm = "LFO" + String (idx + 1) + " ";
-    
+
     auto notes = NoteDuration::getNoteDurations();
 
     enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
     sync             = p.addIntParam (id + "sync",    nm + "Sync",    "Sync",   "", { 0.0, 1.0, 1.0, 1.0 }, 0.0, 0.0f, enableTextFunction);
     wave             = p.addIntParam (id + "wave",    nm + "Wave",    "Wave",   "", { 1.0, 17.0, 1.0, 1.0 }, 1.0, 0.0f, lfoTextFunction);
     rate             = p.addExtParam (id + "rate",    nm + "Rate",    "Rate",   "Hz", { 0.0, 50.0, 0.0, 0.3f }, 10.0, 0.0f);
-    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, 0.0f, durationTextFunction);
+    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 13.0, 0.0f, durationTextFunction);
     depth            = p.addExtParam (id + "depth",   nm + "Depth",   "Depth",  "", { -1.0, 1.0, 0.0, 1.0 }, 1.0, 0.0f);
     phase            = p.addExtParam (id + "phase",   nm + "Phase",   "Phase",  "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, 0.0f);
     offset           = p.addExtParam (id + "offset",  nm + "Offset",  "Offset", "", { -1.0, 1.0, 0.0, 1.0 }, 0.0, 0.0f);
@@ -186,17 +186,39 @@ void VirtualAnalogAudioProcessor::StepLFOParams::setup (VirtualAnalogAudioProces
 {
     String id = "slfo";
     String nm = "Step LFO";
-    
+
     auto notes = NoteDuration::getNoteDurations();
 
     enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
-    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 0.0, 0.0f, durationTextFunction);
+    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 13.0, 0.0f, durationTextFunction);
     length           = p.addIntParam (id + "length",  nm + "Length",   "Length", "", { 2.0, 32.0, 1.0, 1.0f }, 8.0f, 0.0f);
-    
+
     for (int i = 0; i < 32; i++)
     {
         auto num = String (i + 1);
-        level[i]     = p.addIntParam (id + "length" + num,  nm + "Length " + num, "", "", { -1.0, 1.0, 0.0, 1.0f }, 0.0f, 0.0f);
+        level[i]     = p.addIntParam (id + "step" + num,  nm + "Step " + num, "", "", { -1.0, 1.0, 0.0, 1.0f }, 0.0f, 0.0f);
+    }
+}
+
+//==============================================================================
+void VirtualAnalogAudioProcessor::GateParams::setup (VirtualAnalogAudioProcessor& p)
+{
+    String id = "gate";
+    String nm = "Gate";
+
+    auto notes = NoteDuration::getNoteDurations();
+
+    enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
+    beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 7.0, 0.0f, durationTextFunction);
+    length           = p.addIntParam (id + "length",  nm + "Length",  "Length", "", { 2.0, 32.0, 1.0, 1.0f }, 8.0f, 0.0f);
+    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, 0.0f);
+    release          = p.addExtParam (id + "release", nm + "Release", "R",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, 0.0f);
+
+    for (int i = 0; i < 32; i++)
+    {
+        auto num = String (i + 1);
+        l[i]     = p.addIntParam (id + "l" + num,  nm + "L " + num, "", "", { 0.0, 1.0, 1.0, 1.0f }, (i % 2 == 0 || i % 5 == 0) ? 1.0f : 0.0f, 0.0f);
+        r[i]     = p.addIntParam (id + "r" + num,  nm + "R " + num, "", "", { 0.0, 1.0, 1.0, 1.0f }, (i % 2 == 0 || i % 5 == 0) ? 1.0f : 0.0f, 0.0f);
     }
 }
 
@@ -370,11 +392,12 @@ VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 
     for (int i = 0; i < numElementsInArray (lfoParams); i++)
         lfoParams[i].setup (*this, i);
-    
+
     stepLfoParams.setup (*this);
     adsrParams.setup (*this);
 
     globalParams.setup (*this);
+    gateParams.setup (*this);
     chorusParams.setup (*this);
     distortionParams.setup (*this);
     eqParams.setup (*this);
@@ -424,20 +447,20 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     modSrcVelocity  = modMatrix.addPolyModSource ("vel", "MIDI Velocity", false);
 
     for (int i = 0; i <= 119; i++)
-	{
-		String name = MidiMessage::getControllerName (i);
-		if (name.isEmpty())
+    {
+        String name = MidiMessage::getControllerName (i);
+        if (name.isEmpty())
             modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("cc%d", i), String::formatted ("CC %d", i), false));
-		else
-			modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("cc%d", i), String::formatted ("CC %d ", i) + name, false));
-	}
+        else
+            modSrcCC.add (modMatrix.addMonoModSource (String::formatted ("cc%d", i), String::formatted ("CC %d ", i) + name, false));
+    }
 
     for (int i = 0; i < Cfg::numLFOs; i++)
         modSrcMonoLFO.add (modMatrix.addMonoModSource (String::formatted ("mlfo%d", i + 1), String::formatted ("LFO %d (Mono)", i + 1), true));
 
     for (int i = 0; i < Cfg::numLFOs; i++)
         modSrcLFO.add (modMatrix.addPolyModSource (String::formatted ("lfo%d", i + 1), String::formatted ("LFO %d", i + 1), true));
-    
+
     modSrcMonoStep = modMatrix.addMonoModSource ("mstep", "Step LFO (Mono)", true);
     modSrcStep     = modMatrix.addPolyModSource ("step", "Step LFO", true);
 
@@ -463,15 +486,37 @@ void VirtualAnalogAudioProcessor::setupModMatrix()
     modMatrix.build();
 }
 
+void VirtualAnalogAudioProcessor::reset()
+{
+    Processor::reset();
+
+    gate.reset();
+    chorus.reset();
+    distortion.reset();
+    stereoDelay.reset();
+    compressor.reset();
+    limiter.reset();
+
+    eq.reset();
+
+    reverb.reset();
+
+    for (auto& l : modLFOs)
+        l.reset();
+
+    modStepLFO.reset();
+}
+
 void VirtualAnalogAudioProcessor::prepareToPlay (double newSampleRate, int newSamplesPerBlock)
 {
     Processor::prepareToPlay (newSampleRate, newSamplesPerBlock);
-    
+
     bandLimitedLookupTables.setSampleRate (newSampleRate);
     setCurrentPlaybackSampleRate (newSampleRate);
 
     modMatrix.setSampleRate (newSampleRate);
 
+    gate.setSampleRate (newSampleRate);
     chorus.setSampleRate (newSampleRate);
     distortion.setSampleRate (newSampleRate);
     stereoDelay.setSampleRate (newSampleRate);
@@ -484,7 +529,7 @@ void VirtualAnalogAudioProcessor::prepareToPlay (double newSampleRate, int newSa
 
     for (auto& l : modLFOs)
         l.setSampleRate (newSampleRate);
-    
+
     modStepLFO.setSampleRate (newSampleRate);
 }
 
@@ -496,23 +541,23 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
 {
     ScopedNoDenormals noDenormals;
 
-	startBlock();
+    startBlock();
     setMPE (globalParams.mpe->isOn());
-    
+
     playhead = getPlayHead();
-    
+
     int pos = 0;
     int todo = buffer.getNumSamples();
-    
+
     buffer.clear();
 
-	setMono (globalParams.mono->isOn());
+    setMono (globalParams.mono->isOn());
     setLegato (globalParams.legato->isOn());
     setGlissando (globalParams.glideMode->getProcValue() == 1.0f);
     setPortamento (globalParams.glideMode->getProcValue() == 2.0f);
     setGlideRate (globalParams.glideRate->getProcValue());
     setNumVoices (int (globalParams.voices->getProcValue()));
-    
+
     while (todo > 0)
     {
         int thisBlock = std::min (todo, 32);
@@ -525,15 +570,15 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
         applyEffects (slice);
 
         modMatrix.finishBlock (thisBlock);
-        
+
         pos += thisBlock;
         todo -= thisBlock;
     }
 
     playHead = nullptr;
-    
+
     fifo.write (buffer);
-	endBlock (buffer.getNumSamples());
+    endBlock (buffer.getNumSamples());
 }
 
 Array<float> VirtualAnalogAudioProcessor::getLiveFilterCutoff (int i)
@@ -553,10 +598,14 @@ Array<float> VirtualAnalogAudioProcessor::getLiveFilterCutoff (int i)
 
 void VirtualAnalogAudioProcessor::applyEffects (AudioSampleBuffer& buffer)
 {
+    // Apply gate
+    if (gateParams.enable->isOn())
+        gate.process (buffer, noteOnIndex, noteOffIndex);
+
     // Apply Chorus
     if (chorusParams.enable->isOn())
         chorus.process (buffer);
-    
+
     // Apply Distortion
     if (distortionParams.enable->isOn())
         distortion.process (buffer);
@@ -618,19 +667,19 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
             modMatrix.setMonoValue (modSrcMonoLFO[i], 0);
         }
     }
-    
+
     // Update Mono Step LFO
     if (stepLfoParams.enable->isOn())
     {
         float freq = 1.0f / NoteDuration::getNoteDurations()[size_t (stepLfoParams.beat->getProcValue())].toSeconds (playhead);
 
         modStepLFO.setFreq (freq);
-        
+
         int n = int (stepLfoParams.length->getProcValue());
         modStepLFO.setNumPoints (n);
         for (int i = n; --i >= 0;)
             modStepLFO.setPoint (i, stepLfoParams.level[i]->getProcValue());
-        
+
         modStepLFO.process (newBlockSize);
 
         modMatrix.setMonoValue (modSrcMonoStep, modStepLFO.getOutput());
@@ -638,6 +687,23 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
     else
     {
         modMatrix.setMonoValue (modSrcMonoStep, 0);
+    }
+
+    // Update Gate
+    if (gateParams.enable->isOn())
+    {
+        float freq = 1.0f / NoteDuration::getNoteDurations()[size_t (gateParams.beat->getProcValue())].toSeconds (playhead);
+
+        int n = int (gateParams.length->getProcValue());
+
+        gate.setLength (n);
+
+        for (int i = 0; i < n; i++)
+            gate.setStep (i, gateParams.l[i]->isOn(), gateParams.r[i]->isOn());
+
+        gate.setFrequency (freq);
+        gate.setAttack (modMatrix.getValue (gateParams.attack));
+        gate.setRelease (modMatrix.getValue (gateParams.release));
     }
 
     // Update Chorus
@@ -667,7 +733,7 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
                       modMatrix.getValue (eqParams.loFreq),
                       modMatrix.getValue (eqParams.loQ),
                       modMatrix.getValue (eqParams.loGain));
-        
+
         eq.setParams (1, EQ::peak,
                       modMatrix.getValue (eqParams.mid1Freq),
                       modMatrix.getValue (eqParams.mid1Q),
@@ -751,8 +817,8 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
 
 void VirtualAnalogAudioProcessor::handleMidiEvent (const MidiMessage& m)
 {
-	MPESynthesiser::handleMidiEvent (m);
-	
+    MPESynthesiser::handleMidiEvent (m);
+
     if (m.isPitchWheel())
         modMatrix.setMonoValue (modScrPitchBend, float (m.getPitchWheelValue()) / 0x2000 - 1.0f);
 }

@@ -12,7 +12,7 @@ public:
         : gin::PagedControlBox (e), proc (proc_)
     {
         auto& g = proc.globalParams;
-        
+
         addPage ("Main", 3, 2);
 
         addControl (0, new gin::Knob (g.level), 0, 0);
@@ -22,25 +22,25 @@ public:
         addControl (0, v = new gin::Knob (g.voices), 0, 1);
         addControl (0, l = new gin::Switch (g.legato), 1, 1);
         addControl (0, s = new gin::Knob (g.glideRate), 2, 1);
-        
+
         watchParam (g.mono);
         watchParam (g.glideMode);
-        
+
         addPage ("Control", 1, 2);
 
         addControl (1, new gin::Switch (g.mpe), 0, 0);
     }
-    
+
     void paramChanged() override
     {
         gin::PagedControlBox::paramChanged();
-        
+
         auto& g = proc.globalParams;
         v->setEnabled (! g.mono->isOn());
         l->setEnabled (g.glideMode->getProcValue() != 0.0f);
         s->setEnabled (g.glideMode->getProcValue() != 0.0f);
     }
-    
+
     VirtualAnalogAudioProcessor& proc;
     ParamComponentPtr v, l, s;
 };
@@ -55,7 +55,7 @@ public:
         for ( int i = 0; i < numElementsInArray (proc.oscParams); i++)
         {
             auto& osc = proc.oscParams[i];
-            
+
             addPage ("OSC " + String (i + 1), 3, 2);
             addPageEnable (i * 2, osc.enable);
 
@@ -76,7 +76,7 @@ public:
 
             watchParam (osc.voices);
         }
-        
+
         setPageOpen (0, true);
         setPageOpen (2, true);
         setPageOpen (4, true);
@@ -112,7 +112,7 @@ public:
         for (int i = 0; i < numElementsInArray (proc.filterParams); i++)
         {
             auto& flt = proc.filterParams[i];
-            
+
             addPage ("Filter " + String (i + 1), 8, 2);
             addBottomButton (i, new gin::ModulationSourceButton (proc.modMatrix, proc.modSrcFilter[i], true));
             addPageEnable (i, flt.enable);
@@ -141,7 +141,7 @@ public:
             {
                 if (proc.filterParams[i].amount->getUserValue()      != 0.0f ||
                     proc.filterParams[i].keyTracking->getUserValue() != 0.0f ||
-					proc.modMatrix.isModulated (gin::ModDstId (proc.filterParams[i].frequency->getModIndex())))
+                    proc.modMatrix.isModulated (gin::ModDstId (proc.filterParams[i].frequency->getModIndex())))
                     return proc.getLiveFilterCutoff (i);
                 return Array<float>();
             });
@@ -267,14 +267,14 @@ public:
 
         addControl (cnt, new gin::Select (stp.beat), 0, 0);
         addControl (cnt, new gin::Knob (stp.length), 0, 1);
-        
+
         auto s = new gin::StepLFOComponent();
         s->setParams (stp.beat, stp.length, stp.level, stp.enable);
         addControl (cnt, s, 1, 0, 5, 2);
         cnt++;
-        
-		addPage ("All", 5, 2);
-		addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 5, 2);
+
+        addPage ("All", 5, 2);
+        addControl (cnt, new gin::ModSrcListBox (proc.modMatrix), 0, 0, 5, 2);
         cnt++;
 
         addPage ("Mod Matrix", 5, 2);
@@ -306,6 +306,17 @@ public:
         : gin::PagedControlBox (e), proc (proc_)
     {
         int idx = 0;
+
+        addPage ("Gate", 8, 2);
+        addPageEnable (idx, proc.gateParams.enable);
+        addControl (idx, new gin::Select (proc.gateParams.beat), 0, 0);
+        addControl (idx, new gin::Knob (proc.gateParams.length), 1, 0);
+        addControl (idx, new gin::Knob (proc.gateParams.attack), 0, 1);
+        addControl (idx, new gin::Knob (proc.gateParams.release), 1, 1);
+        auto g = new gin::GateEffectComponent ();
+        g->setParams (proc.gateParams.length, proc.gateParams.l, proc.gateParams.r, proc.gateParams.enable);
+        addControl (idx, g, 2, 0, 6, 2);
+        idx++;
 
         addPage ("Chorus", 3, 2);
         addPageEnable (idx, proc.chorusParams.enable);
@@ -377,7 +388,7 @@ public:
         addControl (idx, new gin::Knob (proc.limiterParams.threshold), 0, 1);
         addControl (idx, new gin::Knob (proc.limiterParams.gain), 1, 1);
         idx++;
-        
+
         addPage ("Scope", 8, 2);
         auto scope = new gin::TriggeredScope (proc.fifo);
         scope->setNumChannels (2);
@@ -385,6 +396,8 @@ public:
         scope->setColour (gin::TriggeredScope::lineColourId, Colours::transparentBlack);
         addControl (idx, scope, 0, 0, 8, 2);
         idx++;
+
+        setPageOpen (0, false);
     }
 
     void paramChanged () override

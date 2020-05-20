@@ -17,6 +17,7 @@ public:
     void updateState() override;
 
     //==============================================================================
+    void reset() override;
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -98,7 +99,7 @@ public:
 
         JUCE_DECLARE_NON_COPYABLE (StepLFOParams)
     };
-    
+
     struct ADSRParams
     {
         ADSRParams() = default;
@@ -120,6 +121,19 @@ public:
         void setup (VirtualAnalogAudioProcessor& p);
 
         JUCE_DECLARE_NON_COPYABLE (GlobalParams)
+    };
+
+    struct GateParams
+    {
+        GateParams() = default;
+
+        gin::Parameter::Ptr enable, beat, length, attack, release;
+        gin::Parameter::Ptr l[32] = { nullptr };
+        gin::Parameter::Ptr r[32] = { nullptr };
+
+        void setup (VirtualAnalogAudioProcessor& p);
+
+        JUCE_DECLARE_NON_COPYABLE (GateParams)
     };
 
     struct ChorusParams
@@ -220,6 +234,7 @@ public:
     ADSRParams adsrParams;
 
     GlobalParams globalParams;
+    GateParams gateParams;
     ChorusParams chorusParams;
     DistortionParams distortionParams;
     EQParams eqParams;
@@ -229,6 +244,7 @@ public:
     LimiterParams limiterParams;
 
     //==============================================================================
+    gin::GateEffect gate;
     gin::Modulation chorus { 0.5f };
     gin::Distortion distortion;
     gin::StereoDelay stereoDelay { 120.1 };
@@ -250,4 +266,3 @@ public:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessor)
 };
-

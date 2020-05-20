@@ -21,7 +21,7 @@ VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAna
     gin::addAndMakeVisible (*this, { &modulationHeader, &modulation });
     gin::addAndMakeVisible (*this, { &effectsHeader, &effects });
 
-	oscHeaders.addAndMakeVisible ( usage );
+    oscHeaders.addAndMakeVisible ( usage );
 
     setGridSize (14, 8, 0, 4 * 25);
 }
@@ -62,7 +62,7 @@ void VirtualAnalogAudioProcessorEditor::resized()
 
         modOverview.setBounds (4, 4, 200, hh - 8);
 
-		usage.setBounds ( oscHeaders.getLocalBounds().removeFromRight (14 * 5 + 2).withSizeKeepingCentre (14 * 5 + 2, 16));
+        usage.setBounds ( oscHeaders.getLocalBounds().removeFromRight (14 * 5 + 2).withSizeKeepingCentre (14 * 5 + 2, 16));
     }
 
     // Filters
