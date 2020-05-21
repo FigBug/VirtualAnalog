@@ -211,8 +211,8 @@ void VirtualAnalogAudioProcessor::GateParams::setup (VirtualAnalogAudioProcessor
     enable           = p.addIntParam (id + "enable",  nm + "Enable",  "Enable", "", { 0.0, 1.0, 1.0, 1.0 }, 0.0f, 0.0f, enableTextFunction);
     beat             = p.addIntParam (id + "beat",    nm + "Beat",    "Beat",   "", { 0.0, float (notes.size() - 1), 1.0, 1.0 }, 7.0, 0.0f, durationTextFunction);
     length           = p.addIntParam (id + "length",  nm + "Length",  "Length", "", { 2.0, 32.0, 1.0, 1.0f }, 8.0f, 0.0f);
-    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, 0.0f);
-    release          = p.addExtParam (id + "release", nm + "Release", "R",     "s", { 0.0, 60.0, 0.0, 0.2f }, 0.1f, 0.0f);
+    attack           = p.addExtParam (id + "attack",  nm + "Attack",  "A",     "s", { 0.0, 1.0, 0.0, 0.2f }, 0.1f, 0.0f);
+    release          = p.addExtParam (id + "release", nm + "Release", "R",     "s", { 0.0, 1.0, 0.0, 0.2f }, 0.1f, 0.0f);
 
     for (int i = 0; i < 32; i++)
     {
