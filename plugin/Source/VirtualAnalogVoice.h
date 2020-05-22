@@ -35,7 +35,7 @@ private:
     VirtualAnalogAudioProcessor& proc;
     gin::BandLimitedLookupTables& bandLimitedLookupTables;
 
-    gin::VoicedStereoOscillator oscillators[Cfg::numOSCs] =
+    gin::BLLTVoicedStereoOscillator oscillators[Cfg::numOSCs] =
     {
         bandLimitedLookupTables,
         bandLimitedLookupTables,
@@ -53,7 +53,7 @@ private:
     gin::AnalogADSR adsr;
 
     float currentMidiNotes[Cfg::numOSCs];
-    gin::VoicedStereoOscillator::Params oscParams[Cfg::numOSCs];
+    gin::BLLTVoicedStereoOscillator::Params oscParams[Cfg::numOSCs];
     
     gin::EasedValueSmoother<float> noteSmoother;
     
