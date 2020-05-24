@@ -201,7 +201,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         if (! proc.oscParams[i].enable->isOn()) continue;
         
         currentMidiNotes[i] = noteSmoother.getCurrentValue() * 127.0f;
-        if (glideInfo.glissando) currentMidiNotes[i] = roundToInt (currentMidiNotes[i]);
+        if (glideInfo.glissando) currentMidiNotes[i] = (float) roundToInt (currentMidiNotes[i]);
         currentMidiNotes[i] += float (note.totalPitchbendInSemitones);
         currentMidiNotes[i] += getValue (proc.oscParams[i].tune) + getValue (proc.oscParams[i].finetune) / 100.0f;
 

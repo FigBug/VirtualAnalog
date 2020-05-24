@@ -567,8 +567,8 @@ void VirtualAnalogAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
 
         renderNextBlock (buffer, midi, pos, thisBlock);
 
-        auto slice = sliceBuffer (buffer, pos, thisBlock);
-        applyEffects (slice);
+        auto bufferSlice = sliceBuffer (buffer, pos, thisBlock);
+        applyEffects (bufferSlice);
 
         modMatrix.finishBlock (thisBlock);
 
