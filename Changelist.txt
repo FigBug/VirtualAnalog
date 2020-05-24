@@ -1,3 +1,6 @@
+0.0.4:
+- Fixed mod learn from being to sensitive
+
 0.0.3:
 - Fixed amp velocity track
 - Fixed filter velocity track

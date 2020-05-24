@@ -8,6 +8,7 @@ static String waveTextFunction (const Parameter&, float v)
 {
     switch ((Wave)int (v))
     {
+        case Wave::silence:     return "Off";
         case Wave::sine:        return "Sine";
         case Wave::triangle:    return "Triangle";
         case Wave::sawUp:       return "Saw (Up)";
