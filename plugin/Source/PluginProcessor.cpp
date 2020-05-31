@@ -16,6 +16,7 @@ static String waveTextFunction (const Parameter&, float v)
         case Wave::pulse:       return "Pulse";
         case Wave::square:      return "Square";
         case Wave::noise:       return "Noise";
+        case Wave::wavetable:
         default:
             jassertfalse;
             return {};

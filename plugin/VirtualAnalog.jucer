@@ -7,19 +7,20 @@
               cppLanguageStandard="latest" pluginChannelConfigs="{0,2}" version="0.0.2">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
-      <FILE id="Ma3e0n" name="Cfg.h" compile="0" resource="0" file="Source/Cfg.h"/>
       <FILE id="f12Jxy" name="Boxes.h" compile="0" resource="0" file="Source/Boxes.h"/>
-      <FILE id="hVjqti" name="VirtualAnalogVoice.cpp" compile="1" resource="0"
-            file="Source/VirtualAnalogVoice.cpp"/>
-      <FILE id="BmWCuH" name="VirtualAnalogVoice.h" compile="0" resource="0"
-            file="Source/VirtualAnalogVoice.h"/>
+      <FILE id="Ma3e0n" name="Cfg.h" compile="0" resource="0" file="Source/Cfg.h"/>
+      <FILE id="vHUUNd" name="Panels.h" compile="0" resource="0" file="Source/Panels.h"/>
+      <FILE id="EG0VAx" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="rezjyh" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="p0fko7" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="IM4H1y" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="EG0VAx" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="rezjyh" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="hVjqti" name="VirtualAnalogVoice.cpp" compile="1" resource="0"
+            file="Source/VirtualAnalogVoice.cpp"/>
+      <FILE id="BmWCuH" name="VirtualAnalogVoice.h" compile="0" resource="0"
+            file="Source/VirtualAnalogVoice.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
