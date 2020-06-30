@@ -107,9 +107,9 @@ public:
     void resized() override;
 
 private:
-    VirtualAnalogAudioProcessor& proc;
+    VirtualAnalogAudioProcessor& vaProc;
 
-    Editor editor { proc };
+    Editor editor { vaProc };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessorEditor)
 };

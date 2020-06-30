@@ -5,7 +5,7 @@ using namespace gin;
 
 //==============================================================================
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
-    : ProcessorEditor (p, 50, 50 + 15), proc (p)
+    : ProcessorEditor (p, 50, 50 + 15), vaProc (p)
 {
     addAndMakeVisible (editor);
 
