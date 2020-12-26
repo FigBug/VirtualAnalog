@@ -68,17 +68,17 @@ public:
 
     VirtualAnalogAudioProcessor& proc;
 
-    OscillatorBox oscillators[Cfg::numOSCs] = { { "oscillator 1", proc, 0 }, { "oscillator 2", proc, 1 },
-                                                { "oscillator 3", proc, 2 }, { "oscillator 4", proc, 3 } };
+    OscillatorBox oscillators[Cfg::numOSCs] { { "oscillator 1", proc, 0 }, { "oscillator 2", proc, 1 },
+                                              { "oscillator 3", proc, 2 }, { "oscillator 4", proc, 3 } };
 
-    FilterBox filters[Cfg::numFilters]      = { { "filter 1", proc, 0 }, { "filter 2", proc, 1 } };
+    FilterBox filters[Cfg::numFilters]      { { "filter 1", proc, 0 }, { "filter 2", proc, 1 } };
 
-    ADSRArea adsrs[Cfg::numFilters]         = { { proc, 0 }, { proc, 1 } };
+    ADSRArea adsrs[Cfg::numFilters]         { { proc, 0 }, { proc, 1 } };
 
     MixBox mix                              { "osc mix", proc };
 
-    LFOBox lfos[Cfg::numLFOs]               = { { "LFO 1", proc, 0 }, { "LFO 2", proc, 1 }, { "LFO 3", proc, 2 } };
-    LFOArea lfoGraphs[Cfg::numLFOs]         = { { proc, 0 }, { proc, 1 }, { proc, 2 } };
+    LFOBox lfos[Cfg::numLFOs]               { { "LFO 1", proc, 0 }, { "LFO 2", proc, 1 }, { "LFO 3", proc, 2 } };
+    LFOArea lfoGraphs[Cfg::numLFOs]         { { proc, 0 }, { proc, 1 }, { proc, 2 } };
 
     GateBox gate { proc };
     GateArea pattern { proc };
