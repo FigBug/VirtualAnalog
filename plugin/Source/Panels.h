@@ -8,7 +8,7 @@
 class OscillatorBox : public gin::ParamBox
 {
 public:
-    OscillatorBox (const String& name, VirtualAnalogAudioProcessor& proc_, int idx_)
+    OscillatorBox (const juce::String& name, VirtualAnalogAudioProcessor& proc_, int idx_)
         : gin::ParamBox (name), proc (proc_), idx (idx_)
     {
         auto& osc = proc.oscParams[idx];
@@ -50,7 +50,7 @@ public:
 class FilterBox : public gin::ParamBox
 {
 public:
-    FilterBox (const String& name, VirtualAnalogAudioProcessor& proc_, int idx_)
+    FilterBox (const juce::String& name, VirtualAnalogAudioProcessor& proc_, int idx_)
         : gin::ParamBox (name), proc (proc_), idx (idx_)
     {
         auto& flt = proc.filterParams[idx];
@@ -72,7 +72,7 @@ public:
                 proc.filterParams[idx].keyTracking->getUserValue() != 0.0f ||
                 proc.modMatrix.isModulated (gin::ModDstId (proc.filterParams[idx].frequency->getModIndex())))
                 return proc.getLiveFilterCutoff (idx);
-            return Array<float>();
+            return juce::Array<float>();
         });
     }
 
@@ -132,7 +132,7 @@ public:
 class MixBox : public gin::ParamBox
 {
 public:
-    MixBox (const String& name, VirtualAnalogAudioProcessor& proc_)
+    MixBox (const juce::String& name, VirtualAnalogAudioProcessor& proc_)
         : gin::ParamBox (name), proc (proc_)
     {
     }
@@ -148,7 +148,7 @@ public:
 class LFOBox : public gin::ParamBox
 {
 public:
-    LFOBox (const String& name, VirtualAnalogAudioProcessor& proc_, int idx_)
+    LFOBox (const juce::String& name, VirtualAnalogAudioProcessor& proc_, int idx_)
         : gin::ParamBox (name), proc (proc_), idx (idx_)
     {
         auto& lfo = proc.lfoParams[idx];
@@ -419,7 +419,7 @@ public:
         scope = new gin::TriggeredScope (proc.fifo);
         scope->setNumChannels (2);
         scope->setTriggerMode (gin::TriggeredScope::TriggerMode::Up);
-        scope->setColour (gin::TriggeredScope::lineColourId, Colours::transparentBlack);
+        scope->setColour (gin::TriggeredScope::lineColourId, juce::Colours::transparentBlack);
         addControl (scope);
 
         setSize (272, 163);

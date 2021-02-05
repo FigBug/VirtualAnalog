@@ -1,10 +1,8 @@
 #include "VirtualAnalogVoice.h"
 #include "PluginProcessor.h"
 
-using namespace gin;
-
 //==============================================================================
-VirtualAnalogVoice::VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, BandLimitedLookupTables& bllt)
+VirtualAnalogVoice::VirtualAnalogVoice (VirtualAnalogAudioProcessor& p, gin::BandLimitedLookupTables& bllt)
     : proc (p)
     , bandLimitedLookupTables (bllt)
 {
@@ -33,7 +31,7 @@ void VirtualAnalogVoice::noteStarted()
     proc.modMatrix.setPolyValue (*this, proc.modSrcTimbre, note.initialTimbre.asUnsignedFloat());
     proc.modMatrix.setPolyValue (*this, proc.modSrcPressure, note.pressure.asUnsignedFloat());
 
-    ScopedValueSetter<bool> svs (disableSmoothing, true);
+    juce::ScopedValueSetter<bool> svs (disableSmoothing, true);
 
     for (auto& f : filters)
         f.reset();
@@ -154,12 +152,12 @@ void VirtualAnalogVoice::setCurrentSampleRate (double newRate)
     adsr.setSampleRate (newRate);
 }
 
-void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
+void VirtualAnalogVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
     updateParams (numSamples);
 
     // Run OSC
-    ScratchBuffer buffer (2, numSamples);
+    gin::ScratchBuffer buffer (2, numSamples);
 
     for (int i = 0; i < Cfg::numOSCs; i++)
         if (proc.oscParams[i].enable->isOn())
@@ -167,17 +165,17 @@ void VirtualAnalogVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
 
     // Apply velocity
     float velocity = currentlyPlayingNote.noteOnVelocity.asUnsignedFloat();
-    buffer.applyGain (velocityToGain (velocity, ampKeyTrack));
+    buffer.applyGain (gin::velocityToGain (velocity, ampKeyTrack));
 
     // Apply filters
-    for (int i = 0; i < numElementsInArray (filters); i++)
+    for (int i = 0; i < juce::numElementsInArray (filters); i++)
         if (proc.filterParams[i].enable->isOn())
             filters[i].process (buffer);
     
     // Run ADSR
     adsr.processMultiplying (buffer);
     
-    if (adsr.getState() == AnalogADSR::State::idle)
+    if (adsr.getState() == gin::AnalogADSR::State::idle)
     {
         clearCurrentNote();
         stopVoice();
@@ -201,11 +199,11 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         if (! proc.oscParams[i].enable->isOn()) continue;
         
         currentMidiNotes[i] = noteSmoother.getCurrentValue() * 127.0f;
-        if (glideInfo.glissando) currentMidiNotes[i] = (float) roundToInt (currentMidiNotes[i]);
+        if (glideInfo.glissando) currentMidiNotes[i] = (float) juce::roundToInt (currentMidiNotes[i]);
         currentMidiNotes[i] += float (note.totalPitchbendInSemitones);
         currentMidiNotes[i] += getValue (proc.oscParams[i].tune) + getValue (proc.oscParams[i].finetune) / 100.0f;
 
-        oscParams[i].wave   = (Wave) int (proc.oscParams[i].wave->getProcValue());
+        oscParams[i].wave   = (gin::Wave) int (proc.oscParams[i].wave->getProcValue());
         oscParams[i].voices = int (proc.oscParams[i].voices->getProcValue());
         oscParams[i].vcTrns = int (proc.oscParams[i].voicesTrns->getProcValue());
         oscParams[i].pw     = getValue (proc.oscParams[i].pulsewidth) / 100.0f;
@@ -232,7 +230,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
         filterADSRs[i].process (blockSize);
 
-        float filterWidth = float (getMidiNoteFromHertz (20000.0));
+        float filterWidth = float (gin::getMidiNoteFromHertz (20000.0));
         float filterEnv   = filterADSRs[i].getOutput();
         float filterSens = getValue (proc.filterParams[i].velocityTracking);
         filterSens = currentlyPlayingNote.noteOnVelocity.asUnsignedFloat() * filterSens + 1.0f - filterSens;
@@ -241,45 +239,45 @@ void VirtualAnalogVoice::updateParams (int blockSize)
         n += (currentlyPlayingNote.initialNote - 60) * getValue (proc.filterParams[i].keyTracking);
         n += filterEnv * filterSens * getValue (proc.filterParams[i].amount) * filterWidth;
 
-        float f = getMidiNoteInHertz (n);
+        float f = gin::getMidiNoteInHertz (n);
         float maxFreq = std::min (20000.0f, float (getSampleRate() / 2));
-        f = jlimit (4.0f, maxFreq, f);
+        f = juce::jlimit (4.0f, maxFreq, f);
 
-        float q = Q / (1.0f - (getValue (proc.filterParams[i].resonance) / 100.0f) * 0.99f);
+        float q = gin::Q / (1.0f - (getValue (proc.filterParams[i].resonance) / 100.0f) * 0.99f);
 
         switch (int (proc.filterParams[i].type->getProcValue()))
         {
             case 0:
-                filters[i].setType (Filter::lowpass);
-                filters[i].setSlope (Filter::db12);
+                filters[i].setType (gin::Filter::lowpass);
+                filters[i].setSlope (gin::Filter::db12);
                 break;
             case 1:
-                filters[i].setType (Filter::lowpass);
-                filters[i].setSlope (Filter::db24);
+                filters[i].setType (gin::Filter::lowpass);
+                filters[i].setSlope (gin::Filter::db24);
                 break;
             case 2:
-                filters[i].setType (Filter::highpass);
-                filters[i].setSlope (Filter::db12);
+                filters[i].setType (gin::Filter::highpass);
+                filters[i].setSlope (gin::Filter::db12);
                 break;
             case 3:
-                filters[i].setType (Filter::highpass);
-                filters[i].setSlope (Filter::db24);
+                filters[i].setType (gin::Filter::highpass);
+                filters[i].setSlope (gin::Filter::db24);
                 break;
             case 4:
-                filters[i].setType (Filter::bandpass);
-                filters[i].setSlope (Filter::db12);
+                filters[i].setType (gin::Filter::bandpass);
+                filters[i].setSlope (gin::Filter::db12);
                 break;
             case 5:
-                filters[i].setType (Filter::bandpass);
-                filters[i].setSlope (Filter::db24);
+                filters[i].setType (gin::Filter::bandpass);
+                filters[i].setSlope (gin::Filter::db24);
                 break;
             case 6:
-                filters[i].setType (Filter::notch);
-                filters[i].setSlope (Filter::db12);
+                filters[i].setType (gin::Filter::notch);
+                filters[i].setSlope (gin::Filter::db12);
                 break;
             case 7:
-                filters[i].setType (Filter::notch);
-                filters[i].setSlope (Filter::db24);
+                filters[i].setType (gin::Filter::notch);
+                filters[i].setSlope (gin::Filter::db24);
                 break;
         }
         
@@ -311,15 +309,15 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     {
         if (proc.lfoParams[i].enable->isOn())
         {
-            LFO::Parameters params;
+            gin::LFO::Parameters params;
 
             float freq = 0;
             if (proc.lfoParams[i].sync->getProcValue() > 0.0f)
-                freq = 1.0f / NoteDuration::getNoteDurations()[size_t (proc.lfoParams[i].beat->getProcValue())].toSeconds (proc.playhead);
+                freq = 1.0f / gin::NoteDuration::getNoteDurations()[size_t (proc.lfoParams[i].beat->getProcValue())].toSeconds (proc.playhead);
             else
                 freq = getValue (proc.lfoParams[i].rate);
 
-            params.waveShape = (LFO::WaveShape) int (proc.lfoParams[i].wave->getProcValue());
+            params.waveShape = (gin::LFO::WaveShape) int (proc.lfoParams[i].wave->getProcValue());
             params.frequency = freq;
             params.phase     = getValue (proc.lfoParams[i].phase);
             params.offset    = getValue (proc.lfoParams[i].offset);
@@ -341,7 +339,7 @@ void VirtualAnalogVoice::updateParams (int blockSize)
     // Update Step LFO
     if (proc.stepLfoParams.enable->isOn())
     {
-        float freq = 1.0f / NoteDuration::getNoteDurations()[size_t (proc.stepLfoParams.beat->getProcValue())].toSeconds (proc.playhead);
+        float freq = 1.0f / gin::NoteDuration::getNoteDurations()[size_t (proc.stepLfoParams.beat->getProcValue())].toSeconds (proc.playhead);
 
         modStepLFO.setFreq (freq);
         
@@ -375,5 +373,5 @@ bool VirtualAnalogVoice::isVoiceActive()
 float VirtualAnalogVoice::getFilterCutoffNormalized (int idx)
 {
     float freq = filters[idx].getFrequency();
-    return proc.filterParams[idx].frequency->getUserRange().convertTo0to1 (getMidiNoteFromHertz (freq));
+    return proc.filterParams[idx].frequency->getUserRange().convertTo0to1 (gin::getMidiNoteFromHertz (freq));
 }

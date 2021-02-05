@@ -23,7 +23,7 @@ public:
     
     void setCurrentSampleRate (double newRate) override;
 
-    void renderNextBlock (AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
+    void renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
 
     bool isVoiceActive() override;
 

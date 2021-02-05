@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="C56KyA" name="VirtualAnalog" projectType="audioplug" companyName="SocaLabs"
-              reportAppUsage="0" displaySplashScreen="0" pluginFormats="buildAU,buildStandalone,buildVST"
+              reportAppUsage="0" displaySplashScreen="0" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
               cppLanguageStandard="latest" pluginChannelConfigs="{0,2}" version="0.0.2"
-              jucerFormatVersion="1">
+              jucerFormatVersion="1" companyWebsite="www.socalabs.com" companyEmail="roland@socalabs.com"
+              companyCopyright="Copyright &#169; 2021 SocaLabs" addUsingNamespaceToJuceHeader="0"
+              pluginVST3Category="Instrument" pluginVSTCategory="kPlugCategSynth">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
       <FILE id="f12Jxy" name="Boxes.h" compile="0" resource="0" file="Source/Boxes.h"/>

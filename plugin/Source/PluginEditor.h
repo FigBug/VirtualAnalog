@@ -5,7 +5,7 @@
 #include "Panels.h"
 
 //==============================================================================
-class Editor : public Component
+class Editor : public juce::Component
 {
 public:
     Editor (VirtualAnalogAudioProcessor& proc_)
@@ -103,13 +103,15 @@ public:
     ~VirtualAnalogAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     void resized() override;
 
 private:
     VirtualAnalogAudioProcessor& vaProc;
 
     Editor editor { vaProc };
+
+    gin::CopperLookAndFeel lf;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessorEditor)
 };
