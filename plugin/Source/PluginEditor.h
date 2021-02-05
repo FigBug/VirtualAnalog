@@ -111,7 +111,5 @@ private:
 
     Editor editor { vaProc };
 
-    gin::CopperLookAndFeel lf;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualAnalogAudioProcessorEditor)
 };

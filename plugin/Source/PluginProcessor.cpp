@@ -378,6 +378,8 @@ void VirtualAnalogAudioProcessor::LimiterParams::setup (VirtualAnalogAudioProces
 //==============================================================================
 VirtualAnalogAudioProcessor::VirtualAnalogAudioProcessor()
 {
+    lf = std::make_unique<gin::CopperLookAndFeel>();
+
     enableLegacyMode();
     setVoiceStealingEnabled (true);
 
