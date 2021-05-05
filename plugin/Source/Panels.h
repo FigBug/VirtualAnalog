@@ -90,10 +90,10 @@ public:
 };
 
 //==============================================================================
-class ADSRArea : public gin::ParamArea
+class FilterADSRArea : public gin::ParamArea
 {
 public:
-    ADSRArea (VirtualAnalogAudioProcessor& proc_, int idx_)
+    FilterADSRArea (VirtualAnalogAudioProcessor& proc_, int idx_)
         : proc (proc_), idx (idx_)
     {
         auto& flt = proc.filterParams[idx];

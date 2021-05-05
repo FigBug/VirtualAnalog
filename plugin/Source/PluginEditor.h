@@ -13,7 +13,7 @@ public:
     {
         for (auto& o : oscillators) addAndMakeVisible (o);
         for (auto& f : filters)     addAndMakeVisible (f);
-        for (auto& a : adsrs)       addAndMakeVisible (a);
+        for (auto& a : fltADSR)     addAndMakeVisible (a);
         for (auto& l : lfos)        addAndMakeVisible (l);
         for (auto& l : lfoGraphs)   addAndMakeVisible (l);
 
@@ -26,10 +26,11 @@ public:
 
         for (int i = 0; i < Cfg::numLFOs; i++)
         {
-            modulation.addBox (&lfos[i]);
-            modulation.addBox (&lfoGraphs[i]);
+            lfoBox.addBox (i, &lfos[i]);
+            lfoBox.addBox (i, &lfoGraphs[i]);
         }
-        addAndMakeVisible (modulation);
+        addAndMakeVisible (lfoBox);
+        lfoBox.setPage (0);
 
         for (auto& i : fxItems)
             fxHeader.addItem (i);
@@ -48,6 +49,25 @@ public:
         effects.addBox (&scope);
 
         addAndMakeVisible (effects);
+
+        setupCallbacks();
+    }
+
+    void setupCallbacks()
+    {
+        // LFO mod items
+        for (int i = 0; i < Cfg::numLFOs; i++)
+        {
+            modItems[i].onClick = [this, i]
+            {
+                modItems[0].setSelected (i == 0);
+                modItems[1].setSelected (i == 1);
+                modItems[2].setSelected (i == 2);
+
+                lfoBox.setPage (i);
+            };
+        }
+        modItems[0].onClick();
     }
 
     void resized() override
@@ -61,16 +81,16 @@ public:
 
         auto rcFlt = rc.removeFromTop (163);
         filters[0].setBounds (rcFlt.removeFromLeft (168));  rcFlt.removeFromLeft (1);
-        adsrs[0].setBounds (rcFlt.removeFromLeft (186));    rcFlt.removeFromLeft (1);
+        fltADSR[0].setBounds (rcFlt.removeFromLeft (186));  rcFlt.removeFromLeft (1);
         mix.setBounds (rcFlt.removeFromLeft (187));         rcFlt.removeFromLeft (1);
-        adsrs[1].setBounds (rcFlt.removeFromLeft (186));    rcFlt.removeFromLeft (1);
+        fltADSR[1].setBounds (rcFlt.removeFromLeft (186));  rcFlt.removeFromLeft (1);
         filters[1].setBounds (rcFlt.removeFromLeft (168));  rcFlt.removeFromLeft (1);
 
         auto rcB1 = rc.removeFromTop (26);
         modHeader.setBounds (rcB1);
 
         auto rcMod = rc.removeFromTop (163);
-        modulation.setBounds (rcMod);
+        lfoBox.setBounds (rcMod);
 
         auto rcB2 = rc.removeFromTop (26);
         fxHeader.setBounds (rcB2);
@@ -86,7 +106,7 @@ public:
 
     FilterBox filters[Cfg::numFilters]      { { "filter 1", proc, 0 }, { "filter 2", proc, 1 } };
 
-    ADSRArea adsrs[Cfg::numFilters]         { { proc, 0 }, { proc, 1 } };
+    FilterADSRArea fltADSR[Cfg::numFilters] { { proc, 0 }, { proc, 1 } };
 
     MixBox mix                              { "osc mix", proc };
 
@@ -126,7 +146,7 @@ public:
     LimitBox limit { proc };
     ScopeArea scope { proc };
 
-    gin::BoxArea modulation;
+    gin::BoxArea lfoBox;
     gin::BoxArea effects;
 };
 
