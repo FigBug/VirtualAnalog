@@ -7,10 +7,10 @@
               cppLanguageStandard="latest" pluginChannelConfigs="{0,2}" version="0.0.2"
               jucerFormatVersion="1" companyWebsite="www.socalabs.com" companyEmail="roland@socalabs.com"
               companyCopyright="Copyright &#169; 2021 SocaLabs" addUsingNamespaceToJuceHeader="0"
-              pluginVST3Category="Instrument" pluginVSTCategory="kPlugCategSynth">
+              pluginVST3Category="Instrument" pluginVSTCategory="kPlugCategSynth"
+              useAppConfig="0" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
   <MAINGROUP id="Hs1HPA" name="VirtualAnalog">
     <GROUP id="{0CE63D98-F319-7656-21CD-D7A21B4A4B6C}" name="Source">
-      <FILE id="f12Jxy" name="Boxes.h" compile="0" resource="0" file="Source/Boxes.h"/>
       <FILE id="Ma3e0n" name="Cfg.h" compile="0" resource="0" file="Source/Cfg.h"/>
       <FILE id="vHUUNd" name="Panels.h" compile="0" resource="0" file="Source/Panels.h"/>
       <FILE id="EG0VAx" name="PluginEditor.cpp" compile="1" resource="0"
@@ -30,8 +30,10 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" vstLegacyFolder="../modules/plugin_sdk/vstsdk2.4"
                extraCompilerFlags="-Wunused-value">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" recommendedWarnings="LLVM" osxCompatibility="10.9 SDK"/>
-        <CONFIGURATION isDebug="0" name="Release" recommendedWarnings="LLVM" osxCompatibility="10.9 SDK"/>
+        <CONFIGURATION isDebug="1" name="Debug" recommendedWarnings="LLVM" osxCompatibility="10.9 SDK"
+                       macOSDeploymentTarget="10.9"/>
+        <CONFIGURATION isDebug="0" name="Release" recommendedWarnings="LLVM" osxCompatibility="10.9 SDK"
+                       macOSDeploymentTarget="10.9"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../modules/juce/modules"/>
@@ -52,6 +54,7 @@
         <MODULEPATH id="gin" path="../modules/gin/modules"/>
         <MODULEPATH id="gin_dsp" path="../modules/gin/modules"/>
         <MODULEPATH id="juce_dsp" path="../modules/juce/modules"/>
+        <MODULEPATH id="gin_gui" path="../modules/gin/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2019 targetFolder="Builds/VisualStudio2019" vstLegacyFolder="../modules/plugin_sdk/vstsdk2.4">
@@ -82,6 +85,7 @@
         <MODULEPATH id="gin" path="../modules/gin/modules"/>
         <MODULEPATH id="gin_dsp" path="../modules/gin/modules"/>
         <MODULEPATH id="juce_dsp" path="../modules/juce/modules"/>
+        <MODULEPATH id="gin_gui" path="../modules/gin/modules"/>
       </MODULEPATHS>
     </VS2019>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" vstLegacyFolder="../modules/plugin_sdk/vstsdk2.4"
@@ -109,12 +113,14 @@
         <MODULEPATH id="gin" path="../modules/gin/modules"/>
         <MODULEPATH id="gin_dsp" path="../modules/gin/modules"/>
         <MODULEPATH id="juce_dsp" path="../modules/juce/modules"/>
+        <MODULEPATH id="gin_gui" path="../modules/gin/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="gin" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="gin_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="gin_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="gin_plugin" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

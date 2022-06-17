@@ -3,7 +3,7 @@
 
 //==============================================================================
 VirtualAnalogAudioProcessorEditor::VirtualAnalogAudioProcessorEditor (VirtualAnalogAudioProcessor& p)
-    : ProcessorEditor (p, 50, 50 + 15), vaProc (p)
+    : ProcessorEditor (p), vaProc (p)
 {
     addAndMakeVisible (editor);
 
