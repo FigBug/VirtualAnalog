@@ -4,7 +4,7 @@
               reportAppUsage="0" displaySplashScreen="0" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
-              cppLanguageStandard="latest" pluginChannelConfigs="{0,2}" version="0.0.2"
+              cppLanguageStandard="17" pluginChannelConfigs="{0,2}" version="0.0.2"
               jucerFormatVersion="1" companyWebsite="www.socalabs.com" companyEmail="roland@socalabs.com"
               companyCopyright="Copyright &#169; 2021 SocaLabs" addUsingNamespaceToJuceHeader="0"
               pluginVST3Category="Instrument" pluginVSTCategory="kPlugCategSynth"
