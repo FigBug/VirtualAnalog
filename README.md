@@ -1,3 +1,5 @@
+# This project is dead, but has been reborn as: https://github.com/FigBug/Wavetable
+
 # VirtualAnalog
 Virtual Analog VST / AU plugin
 
