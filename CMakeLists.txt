@@ -165,7 +165,6 @@ target_include_directories (${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/S
 juce_generate_juce_header (${PLUGIN_NAME})
 
 target_compile_definitions (${PLUGIN_NAME} PRIVATE
-								JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 								JUCE_COREGRAPHICS_DRAW_ASYNC=1
 								JUCE_MODAL_LOOPS_PERMITTED=0
 								JUCE_WEB_BROWSER=0
