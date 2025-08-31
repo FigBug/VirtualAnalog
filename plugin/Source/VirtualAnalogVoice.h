@@ -28,6 +28,11 @@ public:
     bool isVoiceActive() override;
 
     float getFilterCutoffNormalized (int idx);
+	
+	float getCurrentNote() override
+	{
+		return noteSmoother.getCurrentValue();
+	}
 
 private:
     void updateParams (int blockSize);
@@ -53,7 +58,7 @@ private:
     gin::AnalogADSR adsr;
 
     float currentMidiNotes[Cfg::numOSCs];
-    gin::BLLTVoicedStereoOscillator::Params oscParams[Cfg::numOSCs];
+    gin::VoicedStereoOscillatorParams oscParams[Cfg::numOSCs];
     
     gin::EasedValueSmoother<float> noteSmoother;
     

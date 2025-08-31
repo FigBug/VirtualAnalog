@@ -4,7 +4,7 @@
               reportAppUsage="0" displaySplashScreen="0" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginManufacturerCode="Soca" pluginCode="SLva" pluginAUMainType="'aumu'"
-              cppLanguageStandard="17" pluginChannelConfigs="{0,2}" version="0.0.2"
+              cppLanguageStandard="20" pluginChannelConfigs="{0,2}" version="0.0.2"
               jucerFormatVersion="1" companyWebsite="www.socalabs.com" companyEmail="roland@socalabs.com"
               companyCopyright="Copyright &#169; 2021 SocaLabs" addUsingNamespaceToJuceHeader="0"
               pluginVST3Category="Instrument" pluginVSTCategory="kPlugCategSynth"
@@ -30,10 +30,10 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" vstLegacyFolder="../modules/plugin_sdk/vstsdk2.4"
                extraCompilerFlags="-Wunused-value">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" recommendedWarnings="LLVM" osxCompatibility="10.9 SDK"
-                       macOSDeploymentTarget="10.9"/>
-        <CONFIGURATION isDebug="0" name="Release" recommendedWarnings="LLVM" osxCompatibility="10.9 SDK"
-                       macOSDeploymentTarget="10.9"/>
+        <CONFIGURATION isDebug="1" name="Debug" recommendedWarnings="LLVM" osxCompatibility="10.13 SDK"
+                       macOSDeploymentTarget="10.13"/>
+        <CONFIGURATION isDebug="0" name="Release" recommendedWarnings="LLVM" osxCompatibility="10.13 SDK"
+                       macOSDeploymentTarget="10.13"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../modules/juce/modules"/>
@@ -55,6 +55,8 @@
         <MODULEPATH id="gin_dsp" path="../modules/gin/modules"/>
         <MODULEPATH id="juce_dsp" path="../modules/juce/modules"/>
         <MODULEPATH id="gin_gui" path="../modules/gin/modules"/>
+        <MODULEPATH id="gin_simd" path="../modules/gin/modules"/>
+        <MODULEPATH id="gin_graphics" path="../modules/gin/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2022 targetFolder="Builds/VisualStudio2022" vstLegacyFolder="../modules/plugin_sdk/vstsdk2.4">
@@ -86,6 +88,8 @@
         <MODULEPATH id="gin_dsp" path="../modules/gin/modules"/>
         <MODULEPATH id="juce_dsp" path="../modules/juce/modules"/>
         <MODULEPATH id="gin_gui" path="../modules/gin/modules"/>
+        <MODULEPATH id="gin_simd" path="../modules/gin/modules"/>
+        <MODULEPATH id="gin_graphics" path="../modules/gin/modules"/>
       </MODULEPATHS>
     </VS2022>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" vstLegacyFolder="../modules/plugin_sdk/vstsdk2.4"
@@ -114,14 +118,18 @@
         <MODULEPATH id="gin_dsp" path="../modules/gin/modules"/>
         <MODULEPATH id="juce_dsp" path="../modules/juce/modules"/>
         <MODULEPATH id="gin_gui" path="../modules/gin/modules"/>
+        <MODULEPATH id="gin_simd" path="../modules/gin/modules"/>
+        <MODULEPATH id="gin_graphics" path="../modules/gin/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="gin" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="gin_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="gin_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="gin_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="gin_plugin" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="gin_simd" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

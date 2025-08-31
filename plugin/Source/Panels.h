@@ -23,7 +23,6 @@ public:
         addControl (pw = new gin::Knob (osc.pulsewidth), 0, 1);
         addControl (new gin::Knob (osc.finetune, true), 1, 1);
         addControl (spread = new gin::Knob (osc.spread), 2, 1);
-        addControl (trans = new gin::Knob (osc.voicesTrns, true), 3, 1);
 
         watchParam (osc.wave);
         watchParam (osc.voices);
@@ -36,14 +35,13 @@ public:
         auto& osc = proc.oscParams[idx];
         pw->setEnabled ((gin::Wave) int (osc.wave->getProcValue()) == gin::Wave::pulse);
 
-        trans->setEnabled (osc.voices->getProcValue() > 1);
         detune->setEnabled (osc.voices->getProcValue() > 1);
         spread->setEnabled (osc.voices->getProcValue() > 1);
     }
 
     VirtualAnalogAudioProcessor& proc;
     int idx = 0;
-    gin::ParamComponent::Ptr pw, trans, detune, spread;
+    gin::ParamComponent::Ptr pw, detune, spread;
 };
 
 //==============================================================================
@@ -235,7 +233,7 @@ public:
     GateArea (VirtualAnalogAudioProcessor& proc_)
         : gin::ParamArea ("Pattern"), proc (proc_)
     {
-        g = new gin::GateEffectComponent();
+        g = new gin::GateEffectComponent (32);
         g->setParams (proc.gateParams.length, proc.gateParams.l, proc.gateParams.r, proc.gateParams.enable);
         addControl (g);
 

@@ -16,7 +16,7 @@ void VirtualAnalogVoice::noteStarted()
     startVoice();
 
     auto note = getCurrentlyPlayingNote();
-    if (glideInfo.fromNote != -1 && (glideInfo.glissando || glideInfo.portamento))
+	if (! juce::approximatelyEqual (glideInfo.fromNote, -1.0f) && (glideInfo.glissando || glideInfo.portamento))
     {
         noteSmoother.setTime (glideInfo.rate);
         noteSmoother.setValueUnsmoothed (glideInfo.fromNote / 127.0f);
@@ -73,7 +73,7 @@ void VirtualAnalogVoice::noteRetriggered()
 {
     auto note = getCurrentlyPlayingNote();
     
-    if (glideInfo.fromNote != -1 && (glideInfo.glissando || glideInfo.portamento))
+    if (! juce::approximatelyEqual (glideInfo.fromNote, -1.0f) && (glideInfo.glissando || glideInfo.portamento))
     {
         noteSmoother.setTime (glideInfo.rate);
         noteSmoother.setValue (note.initialNote / 127.0f);
@@ -205,7 +205,6 @@ void VirtualAnalogVoice::updateParams (int blockSize)
 
         oscParams[i].wave   = (gin::Wave) int (proc.oscParams[i].wave->getProcValue());
         oscParams[i].voices = int (proc.oscParams[i].voices->getProcValue());
-        oscParams[i].vcTrns = int (proc.oscParams[i].voicesTrns->getProcValue());
         oscParams[i].pw     = getValue (proc.oscParams[i].pulsewidth) / 100.0f;
         oscParams[i].pan    = getValue (proc.oscParams[i].pan);
         oscParams[i].spread = getValue (proc.oscParams[i].spread) / 100.0f;

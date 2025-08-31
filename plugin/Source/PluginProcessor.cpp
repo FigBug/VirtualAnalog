@@ -13,9 +13,9 @@ static juce::String waveTextFunction (const gin::Parameter&, float v)
         case gin::Wave::sawDown:     return "Saw (Down)";
         case gin::Wave::pulse:       return "Pulse";
         case gin::Wave::square:      return "Square";
-        case gin::Wave::noise:       return "Noise";
-        case gin::Wave::wavetable:
-        default:
+        case gin::Wave::whiteNoise:  return "Noise";
+		case gin::Wave::pinkNoise:
+		default:
             jassertfalse;
             return {};
     }
@@ -109,7 +109,6 @@ void VirtualAnalogAudioProcessor::OSCParams::setup (VirtualAnalogAudioProcessor&
     enable     = p.addIntParam (id + "enable",     nm + "Enable",      "Enable",    "", { 0.0, 1.0, 1.0, 1.0 }, idx == 0 ? 1.0f : 0.0f, 0.0f);
     wave       = p.addIntParam (id + "wave",       nm + "Wave",        "Wave",      "", { 1.0, 7.0, 1.0, 1.0 }, 1.0, 0.0f, waveTextFunction);
     voices     = p.addIntParam (id + "unison",     nm + "Unison",      "Unison",    "", { 1.0, 8.0, 1.0, 1.0 }, 1.0, 0.0f);
-    voicesTrns = p.addExtParam (id + "unisontrns", nm + "Unison Trns", "LTrans",    "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, 0.0f);
     tune       = p.addExtParam (id + "tune",       nm + "Tune",        "Tune",      "st", { -36.0, 36.0, 1.0, 1.0 }, 0.0, 0.0f);
     finetune   = p.addExtParam (id + "finetune",   nm + "Fine Tune",   "Fine",      "ct", { -100.0, 100.0, 0.0, 1.0 }, 0.0, 0.0f);
     level      = p.addExtParam (id + "level",      nm + "Level",       "Level",     "db", { -100.0, 0.0, 1.0, 4.0 }, 0.0, 0.0f);
@@ -758,6 +757,7 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
         compressor.setInputGain (1.0f);
         compressor.setOutputGain (modMatrix.getValue (compressorParams.gain));
         compressor.setParams (modMatrix.getValue (compressorParams.attack),
+							  0.0f,
                               modMatrix.getValue (compressorParams.release),
                               modMatrix.getValue (compressorParams.threshold),
                               modMatrix.getValue (compressorParams.ratio),
@@ -808,6 +808,7 @@ void VirtualAnalogAudioProcessor::updateParams (int newBlockSize)
         limiter.setInputGain (1.0f);
         limiter.setOutputGain (modMatrix.getValue (limiterParams.gain));
         limiter.setParams (modMatrix.getValue (limiterParams.attack),
+						   0.0f,
                            modMatrix.getValue (limiterParams.release),
                            modMatrix.getValue (limiterParams.threshold),
                            100, 6);

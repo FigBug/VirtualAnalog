@@ -45,7 +45,7 @@ public:
     {
         OSCParams() = default;
 
-        gin::Parameter::Ptr enable , wave, voices, voicesTrns, tune, finetune,
+        gin::Parameter::Ptr enable , wave, voices, tune, finetune,
                             level, pulsewidth, detune, spread, pan;
 
         void setup (VirtualAnalogAudioProcessor& p, int idx);
@@ -246,7 +246,7 @@ public:
     //==============================================================================
     gin::GateEffect gate;
     gin::Modulation chorus { 0.5f };
-    gin::Distortion distortion;
+    gin::AirWindowsDistortion distortion;
     gin::StereoDelay stereoDelay { 120.1 };
     gin::Dynamics compressor;
     gin::Dynamics limiter;
