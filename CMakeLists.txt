@@ -88,7 +88,7 @@ endforeach()
 
 # Binary Data
 
-set_property (DIRECTORY APPEND PROPERTY LABELS Assets)
+#set_property (DIRECTORY APPEND PROPERTY LABELS Assets)
 
 #file (GLOB_RECURSE binary_files CONFIGURE_DEPENDS
 #	"./plugin/Resources/layout.json"
@@ -97,7 +97,7 @@ set_property (DIRECTORY APPEND PROPERTY LABELS Assets)
 
 #juce_add_binary_data (${PLUGIN_NAME}_Assets SOURCES ${binary_files})
 
-set_target_properties(${PLUGIN_NAME}_Assets PROPERTIES UNITY_BUILD ON UNITY_BUILD_MODE BATCH UNITY_BUILD_BATCH_SIZE 10)
+#set_target_properties(${PLUGIN_NAME}_Assets PROPERTIES UNITY_BUILD ON UNITY_BUILD_MODE BATCH UNITY_BUILD_BATCH_SIZE 10)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -129,9 +129,7 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/plugin/*.h)
 
 target_sources (${PLUGIN_NAME} PRIVATE 
-	${source_files} 
-	${CMAKE_CURRENT_SOURCE_DIR}/modules/MTS-ESP/Client/libMTSClient.h
-	${CMAKE_CURRENT_SOURCE_DIR}/modules/MTS-ESP/Client/libMTSClient.cpp)
+	${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/plugin PREFIX Source FILES ${source_files})
 
 target_link_libraries (${PLUGIN_NAME} PRIVATE
@@ -182,7 +180,7 @@ target_compile_definitions (${PLUGIN_NAME} PRIVATE
 							)
 
 if (APPLE)
-    foreach(t ${FORMATS} "Assets" "All" "")
+    foreach(t ${FORMATS} "All" "")
         set(tgt ${CMAKE_PROJECT_NAME})
         if (NOT t STREQUAL "")
             set(tgt ${tgt}_${t})
@@ -206,7 +204,7 @@ if (APPLE)
 endif()
 
 if (WIN32)
-    foreach(t ${FORMATS} "Assets" "All" "")
+    foreach(t ${FORMATS} "All" "")
         set(tgt ${CMAKE_PROJECT_NAME})
         if (NOT t STREQUAL "")
             set(tgt ${tgt}_${t})
