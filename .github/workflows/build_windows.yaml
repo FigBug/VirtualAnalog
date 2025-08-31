@@ -19,7 +19,7 @@ jobs:
         shell: bash
         env:
           APIKEY: ${{ secrets.APIKEY }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: VirtualAnalog_Win 
           path: ci/bin/VirtualAnalog_Win.zip
