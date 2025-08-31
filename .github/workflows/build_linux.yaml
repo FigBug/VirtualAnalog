@@ -19,7 +19,7 @@ jobs:
         shell: bash
         env:
           APIKEY: ${{ secrets.APIKEY }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: VirtualAnalog_Linux
           path: ci/bin/VirtualAnalog_Linux.zip

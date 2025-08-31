@@ -23,7 +23,7 @@ jobs:
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
           APPLE_USER: ${{ secrets.APPLE_USER }}
           APIKEY: ${{ secrets.APIKEY }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: VirtualAnalog_Mac
           path: ci/bin/VirtualAnalog_Mac.zip
