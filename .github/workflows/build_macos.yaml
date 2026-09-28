@@ -27,3 +27,4 @@ jobs:
         with:
           name: VirtualAnalog_Mac
           path: ci/bin/VirtualAnalog_Mac.zip
+          retention-days: 3

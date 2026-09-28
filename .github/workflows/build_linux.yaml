@@ -23,3 +23,4 @@ jobs:
         with:
           name: VirtualAnalog_Linux
           path: ci/bin/VirtualAnalog_Linux.zip
+          retention-days: 3
